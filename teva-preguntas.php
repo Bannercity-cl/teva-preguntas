@@ -157,12 +157,12 @@ class EmailSurveyPlugin {
     
     public function admin_menu() {
         add_menu_page(
-            'Email Surveys',
-            'Email Surveys',
+            'TEVA Preguntas',           // Page title
+            'TEVA Preguntas',           // Menu title
             'manage_options',
-            'email-surveys',
+            'teva-preguntas',           // Cambiar slug también
             array($this, 'admin_page'),
-            'dashicons-chart-pie', // ← CAMBIADO DE 'dashicons-email-alt' A 'dashicons-chart-pie'
+            'dashicons-chart-pie',
             30
         );
     }
@@ -170,7 +170,7 @@ class EmailSurveyPlugin {
     public function admin_page() {
         ?>
         <div class="wrap">
-            <h1>Gestión de Encuestas por Email</h1>
+            <h1>Sistema TEVA Preguntas</h1>
             
             <!-- Panel de Control/Reset -->
             <div class="postbox" style="margin-top: 20px; border-left: 4px solid #dc3545;">
@@ -183,13 +183,13 @@ class EmailSurveyPlugin {
                     
                     <div class="reset-options" style="display: flex; gap: 15px; flex-wrap: wrap;">
                         <button type="button" id="reset-votes-btn" class="button" style="background: #ffc107; border-color: #ffc107; color: #000;">
-                            🗳️ Limpiar Solo Votos
+                            🗳️ Limpiar Solo Respuestas
                         </button>
                         <button type="button" id="reset-emails-btn" class="button" style="background: #fd7e14; border-color: #fd7e14; color: white;">
-                            📧 Limpiar Solo Emails
+                            📧 Limpiar Solo Participantes
                         </button>
                         <button type="button" id="reset-surveys-btn" class="button" style="background: #6f42c1; border-color: #6f42c1; color: white;">
-                            📋 Limpiar Solo Encuestas
+                            📋 Limpiar Solo Preguntas
                         </button>
                         <button type="button" id="reset-all-btn" class="button" style="background: #dc3545; border-color: #dc3545; color: white;">
                             🚨 RESET COMPLETO
@@ -203,31 +203,31 @@ class EmailSurveyPlugin {
             </div>
             
             <div class="postbox" style="margin-top: 20px;">
-                <h2 class="hndle">Crear Nueva Encuesta</h2>
+                <h2 class="hndle">Crear Nueva Pregunta</h2>
                 <div class="inside">
                     <form id="survey-form">
                         <table class="form-table">
                             <tr>
                                 <th><label>Pregunta:</label></th>
-                                <td><textarea name="question" rows="3" cols="50" required></textarea></td>
+                                <td><textarea name="question" rows="3" cols="50" required placeholder="Ejemplo: ¿Cuál es la capital de España?"></textarea></td>
                             </tr>
                             <tr>
                                 <th><label>Opción 1:</label></th>
-                                <td><input type="text" name="option1" required></td>
+                                <td><input type="text" name="option1" required placeholder="Ejemplo: Madrid"></td>
                             </tr>
                             <tr>
                                 <th><label>Opción 2:</label></th>
-                                <td><input type="text" name="option2" required></td>
+                                <td><input type="text" name="option2" required placeholder="Ejemplo: Barcelona"></td>
                             </tr>
                             <tr>
                                 <th><label>Opción 3:</label></th>
-                                <td><input type="text" name="option3" required></td>
+                                <td><input type="text" name="option3" required placeholder="Ejemplo: Sevilla"></td>
                             </tr>
                             <tr>
                                 <th><label>Respuesta Correcta:</label></th>
                                 <td>
                                     <select name="correct_answer" required>
-                                        <option value="">Seleccionar...</option>
+                                        <option value="">Seleccionar respuesta correcta...</option>
                                         <option value="1">Opción 1</option>
                                         <option value="2">Opción 2</option>
                                         <option value="3">Opción 3</option>
@@ -236,14 +236,14 @@ class EmailSurveyPlugin {
                             </tr>
                         </table>
                         <p class="submit">
-                            <input type="submit" class="button-primary" value="Crear Encuesta">
+                            <input type="submit" class="button-primary" value="Crear Pregunta">
                         </p>
                     </form>
                 </div>
             </div>
             
             <div class="postbox" style="margin-top: 20px;">
-                <h2 class="hndle">Subir Lista de Emails Válidos (CSV)</h2>
+                <h2 class="hndle">Subir Lista de Participantes (CSV)</h2>
                 <div class="inside">
                     <p><strong>Formatos soportados:</strong></p>
                     <ul>
@@ -254,20 +254,20 @@ class EmailSurveyPlugin {
                     <form id="csv-upload-form">
                         <p><input type="file" name="csv_file" accept=".csv" required></p>
                         <p class="submit">
-                            <input type="submit" class="button-primary" value="Subir CSV">
+                            <input type="submit" class="button-primary" value="Subir Lista CSV">
                         </p>
                     </form>
                     
                     <!-- Estado actual del CSV -->
                     <div class="csv-status" style="margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 5px;">
-                        <h4>Estado Actual:</h4>
+                        <h4>Estado Actual de Participantes:</h4>
                         <?php $this->display_csv_status(); ?>
                     </div>
                 </div>
             </div>
             
             <div class="postbox" style="margin-top: 20px;">
-                <h2 class="hndle">Encuestas Activas</h2>
+                <h2 class="hndle">Preguntas Activas</h2>
                 <div class="inside">
                     <?php $this->display_surveys(); ?>
                 </div>
@@ -276,33 +276,33 @@ class EmailSurveyPlugin {
         
         <script>
         jQuery(document).ready(function($) {
-            // Función para reset de votos
+            // Función para reset de respuestas
             $('#reset-votes-btn').on('click', function() {
-                if (!confirm('¿Estás seguro? Esto eliminará TODOS los votos pero mantendrá las encuestas y emails.')) return;
+                if (!confirm('¿Estás seguro? Esto eliminará TODAS las respuestas pero mantendrá las preguntas y participantes.')) return;
                 if (!confirm('Esta acción NO se puede deshacer. ¿Continuar?')) return;
                 
-                resetData('votes', 'Votos eliminados exitosamente');
+                resetData('votes', 'Respuestas eliminadas exitosamente');
             });
             
-            // Función para reset de emails
+            // Función para reset de participantes
             $('#reset-emails-btn').on('click', function() {
-                if (!confirm('¿Estás seguro? Esto eliminará TODOS los emails válidos.')) return;
+                if (!confirm('¿Estás seguro? Esto eliminará TODOS los participantes válidos.')) return;
                 if (!confirm('Esta acción NO se puede deshacer. ¿Continuar?')) return;
                 
-                resetData('emails', 'Lista de emails limpiada exitosamente');
+                resetData('emails', 'Lista de participantes limpiada exitosamente');
             });
             
-            // Función para reset de encuestas
+            // Función para reset de preguntas
             $('#reset-surveys-btn').on('click', function() {
-                if (!confirm('¿Estás seguro? Esto eliminará TODAS las encuestas y sus votos asociados.')) return;
+                if (!confirm('¿Estás seguro? Esto eliminará TODAS las preguntas y sus respuestas asociadas.')) return;
                 if (!confirm('Esta acción NO se puede deshacer. ¿Continuar?')) return;
                 
-                resetData('surveys', 'Encuestas eliminadas exitosamente');
+                resetData('surveys', 'Preguntas eliminadas exitosamente');
             });
             
             // Función para reset completo
             $('#reset-all-btn').on('click', function() {
-                if (!confirm('⚠️ PELIGRO: Esto eliminará TODO (encuestas, emails, votos). ¿Estás seguro?')) return;
+                if (!confirm('⚠️ PELIGRO: Esto eliminará TODO (preguntas, participantes, respuestas). ¿Estás seguro?')) return;
                 if (!confirm('🚨 ÚLTIMA CONFIRMACIÓN: Esta acción borrará TODOS los datos del plugin. ¿Continuar?')) return;
                 
                 resetData('all', 'Plugin reiniciado completamente');
@@ -343,7 +343,7 @@ class EmailSurveyPlugin {
                     nonce: '<?php echo wp_create_nonce("survey_nonce"); ?>'
                 }, function(response) {
                     if(response.success) {
-                        alert('Encuesta creada exitosamente');
+                        alert('Pregunta creada exitosamente');
                         location.reload();
                     } else {
                         alert('Error: ' + response.data);
@@ -371,7 +371,7 @@ class EmailSurveyPlugin {
                     contentType: false,
                     success: function(response) {
                         if(response.success) {
-                            alert('CSV subido exitosamente: ' + response.data);
+                            alert('Lista CSV subida exitosamente: ' + response.data);
                             location.reload();
                         } else {
                             alert('Error: ' + response.data);
@@ -396,7 +396,7 @@ class EmailSurveyPlugin {
         
         if ($surveys) {
             echo '<table class="wp-list-table widefat fixed striped">';
-            echo '<thead><tr><th>ID</th><th>Pregunta</th><th>Opciones</th><th>Respuesta Correcta</th><th>URL para Email</th></tr></thead>';
+            echo '<thead><tr><th>ID</th><th>Pregunta</th><th>Opciones</th><th>Respuesta Correcta</th><th>URLs para Email</th></tr></thead>';
             echo '<tbody>';
             
             foreach ($surveys as $survey) {
@@ -411,14 +411,14 @@ class EmailSurveyPlugin {
                 echo '1: ' . $base_url . '?survey=' . $survey->id . '&email={EMAIL}&option=1<br>';
                 echo '2: ' . $base_url . '?survey=' . $survey->id . '&email={EMAIL}&option=2<br>';
                 echo '3: ' . $base_url . '?survey=' . $survey->id . '&email={EMAIL}&option=3<br>';
-                echo '<small>Reemplaza {EMAIL} con el email del destinatario</small>';
+                echo '<small>Reemplaza {EMAIL} con el email del participante</small>';
                 echo '</td>';
                 echo '</tr>';
             }
             
             echo '</tbody></table>';
         } else {
-            echo '<p>No hay encuestas activas.</p>';
+            echo '<p>No hay preguntas activas.</p>';
         }
     }
     
@@ -442,9 +442,51 @@ class EmailSurveyPlugin {
         );
         
         if ($result) {
-            wp_send_json_success('Encuesta creada exitosamente');
+            wp_send_json_success('Pregunta creada exitosamente');
         } else {
-            wp_send_json_error('Error al crear la encuesta');
+            wp_send_json_error('Error al crear la pregunta');
+        }
+    }
+    
+    public function display_csv_status() {
+        global $wpdb;
+        $table_emails = $wpdb->prefix . 'survey_valid_emails';
+        
+        $total_emails = $wpdb->get_var("SELECT COUNT(*) FROM $table_emails");
+        $recent_emails = $wpdb->get_results("SELECT email, created_at FROM $table_emails ORDER BY created_at DESC LIMIT 10");
+        
+        if ($total_emails > 0) {
+            echo '<div style="color: #155724; background-color: #d4edda; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
+            echo '<strong>✅ Lista de Participantes Cargada Correctamente</strong><br>';
+            echo "Total de participantes válidos: <strong>$total_emails</strong><br>";
+            echo "Última actualización: " . ($recent_emails ? date('d/m/Y H:i:s', strtotime($recent_emails[0]->created_at)) : 'N/A');
+            echo '</div>';
+            
+            if ($recent_emails) {
+                echo '<div class="csv-preview">';
+                echo '<h5>Últimos participantes agregados:</h5>';
+                echo '<div style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: white;">';
+                
+                foreach ($recent_emails as $email_record) {
+                    echo '<div style="padding: 3px 0; border-bottom: 1px solid #eee; font-size: 12px;">';
+                    echo esc_html($email_record->email) . ' <span style="color: #999;">(' . date('d/m H:i', strtotime($email_record->created_at)) . ')</span>';
+                    echo '</div>';
+                }
+                
+                echo '</div>';
+                
+                if ($total_emails > 10) {
+                    echo '<p style="font-size: 11px; color: #666; margin-top: 5px;">... y ' . ($total_emails - 10) . ' participantes más</p>';
+                }
+                
+                echo '</div>';
+            }
+            
+        } else {
+            echo '<div style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 4px;">';
+            echo '<strong>⚠️ No hay participantes cargados</strong><br>';
+            echo 'Debes subir un archivo CSV con la lista de participantes para poder enviar preguntas por email.';
+            echo '</div>';
         }
     }
     
@@ -500,7 +542,7 @@ class EmailSurveyPlugin {
         }
         
         fclose($handle);
-        wp_send_json_success("$count emails importados exitosamente de $line_number líneas procesadas");
+        wp_send_json_success("$count participantes importados exitosamente de $line_number líneas procesadas");
     }
     
     public function survey_form_shortcode($atts) {
@@ -527,15 +569,14 @@ class EmailSurveyPlugin {
             
             // Crear sesión y redirigir a URL limpia
             $session_token = $this->create_session_token($survey_id, $email);
-            setcookie('survey_session', $session_token, time() + (24 * 60 * 60), '/', '', false, true);
             
-            // Redirigir a URL limpia CON PARÁMETRO CORRECTO
-            $clean_url = home_url('/encuesta/?survey=' . $session_token); // ← CAMBIADO DE ?s= A ?survey=
+            // USAR JAVASCRIPT PARA SETEAR LA COOKIE EN LUGAR DE PHP
+            $clean_url = home_url('/encuesta/?survey=' . $session_token);
             if ($preselected_option) {
                 $clean_url .= '&option=' . $preselected_option;
             }
             
-            // Usar JavaScript para redirección suave
+            // Usar JavaScript para redirección suave y setear cookie
             ob_start();
             ?>
             <div style="padding: 20px; text-align: center; border: 2px solid #007cba;">
@@ -550,6 +591,9 @@ class EmailSurveyPlugin {
             </div>
             
             <script>
+            // Setear cookie con JavaScript para evitar el warning de headers
+            document.cookie = 'survey_session=<?php echo $session_token; ?>; path=/; max-age=86400; secure=false; samesite=strict';
+            
             // Animación de progreso
             setTimeout(function() {
                 document.getElementById('progress-bar').style.width = '100%';
@@ -977,7 +1021,7 @@ class EmailSurveyPlugin {
         
         $survey = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_surveys WHERE id = %d", $survey_id));
         if (!$survey) {
-            return '<p>Encuesta no encontrada.</p>';
+            return '<p>Preguntas no encontradas.</p>';
         }
         
         // Obtener datos del usuario actual
@@ -994,7 +1038,541 @@ class EmailSurveyPlugin {
         
         $is_correct = $last_vote ? $last_vote->is_correct : null;
         
+        // Si respondió correctamente, mostrar formulario médico
+        if ($is_correct) {
+            return $this->display_medical_form($email);
+        }
+        
+        // Si no es correcto, mostrar resultados normales con gráfico
+        return $this->display_normal_results($survey, $last_vote, $is_correct, $has_completed, $attempt_count, $max_attempts, $survey_id, $email);
+    }
+    
+    // Nueva función para mostrar el formulario médico
+    private function display_medical_form($email) {
+        ob_start();
+        ?>
+        <div class="medical-form-wrapper">
+            <style>
+                .medical-form-wrapper * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+
+                .medical-form-wrapper body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background: linear-gradient(135deg, #FF7A00 0%, #FFB347 50%, #FFA500 100%);
+                    min-height: 100vh;
+                    padding: 20px;
+                }
+
+                .medical-form-wrapper .container {
+                    max-width: 500px;
+                    margin: 0 auto;
+                    background: white;
+                    border-radius: 20px;
+                    box-shadow: 0 20px 40px rgba(255, 122, 0, 0.3);
+                    overflow: hidden;
+                    animation: slideUp 0.8s ease-out;
+                }
+
+                @keyframes slideUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .medical-form-wrapper .header {
+                    background: linear-gradient(135deg, #FF7A00, #FFB347);
+                    padding: 30px 20px;
+                    text-align: center;
+                    color: white;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .medical-form-wrapper .header::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                    animation: rotate 20s linear infinite;
+                }
+
+                @keyframes rotate {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+
+                .medical-form-wrapper .header h1 {
+                    font-size: 24px;
+                    margin-bottom: 10px;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .medical-form-wrapper .header p {
+                    font-size: 14px;
+                    opacity: 0.9;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .medical-form-wrapper .form-container {
+                    padding: 40px 30px;
+                }
+
+                .medical-form-wrapper .form-group {
+                    margin-bottom: 25px;
+                    position: relative;
+                }
+
+                .medical-form-wrapper .form-group label {
+                    display: block;
+                    margin-bottom: 8px;
+                    color: #333;
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+
+                .medical-form-wrapper .required::after {
+                    content: " *";
+                    color: #FF4444;
+                    font-weight: bold;
+                }
+
+                .medical-form-wrapper .form-control {
+                    width: 100%;
+                    padding: 15px 20px;
+                    border: 2px solid #E0E0E0;
+                    border-radius: 12px;
+                    font-size: 16px;
+                    transition: all 0.3s ease;
+                    background: #FAFAFA;
+                }
+
+                .medical-form-wrapper .form-control:focus {
+                    outline: none;
+                    border-color: #FF7A00;
+                    background: white;
+                    box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
+                    transform: translateY(-2px);
+                }
+
+                .medical-form-wrapper .form-control:hover {
+                    border-color: #FFB347;
+                }
+
+                .medical-form-wrapper select.form-control {
+                    cursor: pointer;
+                    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+                    background-position: right 12px center;
+                    background-repeat: no-repeat;
+                    background-size: 16px;
+                    padding-right: 45px;
+                    appearance: none;
+                }
+
+                .medical-form-wrapper .btn-send-form-fide {
+                    width: 100%;
+                    padding: 18px;
+                    background: linear-gradient(135deg, #FF7A00, #FFB347);
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    font-size: 18px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .medical-form-wrapper .btn-send-form-fide::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                    transition: left 0.5s;
+                }
+
+                .medical-form-wrapper .btn-send-form-fide:hover::before {
+                    left: 100%;
+                }
+
+                .medical-form-wrapper .btn-send-form-fide:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 10px 25px rgba(255, 122, 0, 0.4);
+                }
+
+                .medical-form-wrapper .btn-send-form-fide:active {
+                    transform: translateY(-1px);
+                }
+
+                .medical-form-wrapper .medical-icon {
+                    display: inline-block;
+                    width: 20px;
+                    height: 20px;
+                    background: #FFD700;
+                    border-radius: 50%;
+                    position: relative;
+                    margin-right: 10px;
+                }
+
+                .medical-form-wrapper .medical-icon::before {
+                    content: '+';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: #FF7A00;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+
+                .medical-form-wrapper .form-footer {
+                    text-align: center;
+                    padding: 20px;
+                    background: #F8F9FA;
+                    color: #666;
+                    font-size: 12px;
+                }
+
+                .medical-form-wrapper .help-block {
+                    color: #FF4444;
+                    font-size: 12px;
+                    margin-top: 5px;
+                    min-height: 16px;
+                }
+
+                .medical-form-wrapper #fide-result {
+                    margin: 10px 0;
+                    padding: 10px;
+                    border-radius: 8px;
+                    display: none;
+                }
+
+                .medical-form-wrapper #fide-result.success {
+                    background: #d4edda;
+                    color: #155724;
+                    border: 1px solid #c3e6cb;
+                    display: block;
+                }
+
+                .medical-form-wrapper #fide-result.error {
+                    background: #f8d7da;
+                    color: #721c24;
+                    border: 1px solid #f5c6cb;
+                    display: block;
+                }
+
+                .medical-form-wrapper .control-label {
+                    display: block;
+                    margin-bottom: 8px;
+                    color: #333;
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+
+                .medical-form-wrapper .control-label.required::after {
+                    content: " *";
+                    color: #FF4444;
+                    font-weight: bold;
+                }
+
+                /* Estilos para el mensaje de éxito */
+                .medical-form-wrapper .success-message {
+                    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                    color: white;
+                    padding: 30px;
+                    text-align: center;
+                    border-radius: 15px;
+                    margin: 20px 0;
+                    box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+                    animation: successPulse 2s ease-in-out;
+                }
+
+                @keyframes successPulse {
+                    0% { transform: scale(0.95); opacity: 0; }
+                    50% { transform: scale(1.02); }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+
+                .medical-form-wrapper .success-message h3 {
+                    font-size: 24px;
+                    margin-bottom: 15px;
+                    font-weight: 700;
+                }
+
+                .medical-form-wrapper .success-message p {
+                    font-size: 16px;
+                    line-height: 1.6;
+                    margin-bottom: 10px;
+                    opacity: 0.95;
+                }
+
+                @media (max-width: 480px) {
+                    .medical-form-wrapper .container {
+                        margin: 10px;
+                        border-radius: 15px;
+                    }
+                    
+                    .medical-form-wrapper .form-container {
+                        padding: 30px 20px;
+                    }
+                    
+                    .medical-form-wrapper .header {
+                        padding: 25px 15px;
+                    }
+                }
+            </style>
+
+            <div class="container">
+                <div class="header">
+                    <h1><span class="medical-icon"></span>¡Felicitaciones! 🎉</h1>
+                    <p>Respondiste correctamente. Ahora completa tu registro para recibir los beneficios</p>
+                </div>
+                
+                <div class="form-container">
+                    <div id="fide-content-code-embed">
+                        <form id="fide-embed-form" 
+                              action="https://publiccl1.fidelizador.com/labchile/form/4D985F23A03E1BA4BDDEA1821647C7905B731D3A6420/subscription/save" 
+                              method="POST"
+                              data-fetch-geographic-zones-url="https://publiccl1.fidelizador.com/labchile/api/geo/zone/_country_id_"
+                              data-fetch-countries-url="https://publiccl1.fidelizador.com/labchile/api/geo/countries"
+                              accept-charset="UTF-8">
+                            
+                            <div class="form-group">
+                                <label class="control-label required" for="subscription_field_3">Nombre Completo</label>
+                                <input type="text" 
+                                       id="subscription_field_3" 
+                                       name="subscription[field_3]" 
+                                       required="required" 
+                                       title="Nombre Completo" 
+                                       placeholder="Ingrese su nombre completo" 
+                                       autocomplete="off" 
+                                       data-type="string" 
+                                       rel="required-field" 
+                                       maxlength="64" 
+                                       class="form-control" />
+                                <div class="help-block"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label required" for="subscription_email">E-mail</label>
+                                <input type="email" 
+                                       id="subscription_email" 
+                                       name="subscription[email]" 
+                                       required="required" 
+                                       title="E-mail" 
+                                       placeholder="ejemplo@correo.com" 
+                                       autocomplete="off" 
+                                       rel="required-field" 
+                                       value="<?php echo esc_attr($email); ?>"
+                                       class="form-control" />
+                                <div class="help-block"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label required" for="subscription_field_13">Especialidad</label>
+                                <input type="text" 
+                                       id="subscription_field_13" 
+                                       name="subscription[field_13]" 
+                                       required="required" 
+                                       title="Especialidad" 
+                                       placeholder="Ej: Cardiología, Pediatría, etc." 
+                                       autocomplete="off" 
+                                       data-type="string" 
+                                       rel="required-field" 
+                                       maxlength="64" 
+                                       class="form-control" />
+                                <div class="help-block"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label required" for="subscription_state">Región</label>
+                                <select id="subscription_state" 
+                                        name="subscription[state]" 
+                                        class="form-control"
+                                        required="required" 
+                                        data-selected-value="">
+                                    <option value="">Seleccione su región</option>
+                                </select>
+                                <div class="help-block"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label required" for="subscription_site">Comuna</label>
+                                <select id="subscription_site" 
+                                        name="subscription[site]" 
+                                        class="form-control"
+                                        required="required" 
+                                        data-selected-value="">
+                                    <option value="">Primero seleccione una región</option>
+                                </select>
+                                <div class="help-block"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="subscription_field_101">¿Qué te motivó a participar?</label>
+                                <input type="text" 
+                                       id="subscription_field_101" 
+                                       name="subscription[field_101]" 
+                                       title="Motivo participación" 
+                                       placeholder="Comparta su motivación para participar..." 
+                                       autocomplete="off" 
+                                       data-type="string" 
+                                       maxlength="64" 
+                                       class="form-control" />
+                                <div class="help-block"></div>
+                            </div>
+
+                            <input type="hidden" name="embed" value="1" />
+                            
+                            <div id="fide-result"></div>
+                            
+                            <input type="submit" value="Enviar Registro" class="btn-send-form-fide" />
+                        </form>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    Formulario seguro y confidencial • Sus datos están protegidos
+                </div>
+            </div>
+        </div>
+
+        <script>
+        // Prevenir conflictos con jQuery de WordPress
+        (function() {
+            // Cargar scripts de Fidelizador de forma asíncrona
+            function loadScript(src, callback) {
+                var script = document.createElement('script');
+                script.src = src;
+                script.async = true;
+                script.defer = true;
+                script.onload = callback;
+                document.head.appendChild(script);
+            }
+
+            // Cargar CSS de jQuery UI si no está presente
+            if (!document.querySelector('link[href*="jquery.ui.css"]')) {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://publiccl1.fidelizador.com/css/jquery.ui.css';
+                document.head.appendChild(link);
+            }
+
+            // Cargar el script base de Fidelizador
+            loadScript('https://publiccl1.fidelizador.com/js/form/base.js?v=1', function() {
+                console.log('Fidelizador script loaded');
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // Configurar charset del formulario
+                var charset = document.charset && document.charset !== "windows-1252" ? document.charset : 'UTF-8';
+                var form = document.getElementById("fide-embed-form");
+                if (form) {
+                    form.acceptCharset = charset;
+                }
+
+                // Efectos visuales mejorados
+                document.querySelectorAll('.medical-form-wrapper .form-control').forEach(function(input) {
+                    input.addEventListener('focus', function() {
+                        this.parentElement.classList.add('focused');
+                    });
+                    
+                    input.addEventListener('blur', function() {
+                        this.parentElement.classList.remove('focused');
+                    });
+                });
+
+                // Interceptar el envío exitoso del formulario para mostrar mensaje personalizado
+                var form = document.getElementById('fide-embed-form');
+                if (form) {
+                    var originalSubmit = form.onsubmit;
+                    form.addEventListener('submit', function(e) {
+                        var submitBtn = form.querySelector('.btn-send-form-fide');
+                        var originalText = submitBtn.value;
+                        submitBtn.value = 'Enviando...';
+                        submitBtn.disabled = true;
+
+                        // Simular envío exitoso después de un momento
+                        setTimeout(function() {
+                            // Mostrar mensaje de éxito personalizado
+                            showSuccessMessage();
+                        }, 2000);
+                    });
+                }
+
+                // Observar cambios en el resultado para detectar éxito
+                var observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'childList') {
+                            var result = document.getElementById('fide-result');
+                            if (result && result.innerHTML.trim() !== '') {
+                                if (result.innerHTML.toLowerCase().includes('éxito') || 
+                                    result.innerHTML.toLowerCase().includes('success') ||
+                                    result.innerHTML.toLowerCase().includes('gracias')) {
+                                    showSuccessMessage();
+                                } else if (result.innerHTML.toLowerCase().includes('error') || 
+                                         result.innerHTML.toLowerCase().includes('problema')) {
+                                    result.className = 'error';
+                                }
+                            }
+                        }
+                    });
+                });
+
+                var resultElement = document.getElementById('fide-result');
+                if (resultElement) {
+                    observer.observe(resultElement, {
+                        childList: true,
+                        subtree: true
+                    });
+                }
+
+                function showSuccessMessage() {
+                    var container = document.querySelector('.medical-form-wrapper .form-container');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="success-message">
+                                <h3>¡Gracias por participar! 🎉</h3>
+                                <p>Te enviaremos el kit educativo por correo electrónico una vez confirmado tu correo.</p>
+                                <p>Los accesos online al Congreso SEFIT 2025 se asignarán entre los participantes seleccionados.</p>
+                                <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
+                                    <strong>Revisa tu bandeja de entrada y spam para confirmar tu registro.</strong>
+                                </p>
+                            </div>
+                        `;
+                    }
+                }
+            });
+        })();
+        </script>
+        <?php
+        return ob_get_clean();
+    }
+    
+    // Función para mostrar resultados normales (cuando no es correcto)
+    private function display_normal_results($survey, $last_vote, $is_correct, $has_completed, $attempt_count, $max_attempts, $survey_id, $email) {
         // Obtener estadísticas generales
+        global $wpdb;
+        $table_votes = $wpdb->prefix . 'survey_votes';
+        
         $total_votes = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_votes WHERE survey_id = %d", $survey_id));
         $option1_votes = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_votes WHERE survey_id = %d AND selected_option = 1", $survey_id));
         $option2_votes = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_votes WHERE survey_id = %d AND selected_option = 2", $survey_id));
@@ -1010,11 +1588,11 @@ class EmailSurveyPlugin {
             $option2_percent = 33.3;
             $option3_percent = 33.4;
         }
-        
+
         ob_start();
         ?>
         <div class="results-container">
-            <h2>📊 Resultados de Votación</h2>
+            <h2>📊 Resultados </h2>
             <div class="question"><?php echo esc_html($survey->question); ?></div>
             
             <?php if ($last_vote): ?>
@@ -1257,6 +1835,9 @@ class EmailSurveyPlugin {
                 gap: 20px;
             }
             
+            
+           
+            
             #pieChart {
                 width: 250px !important;
                 height: 250px !important;
@@ -1324,6 +1905,7 @@ class EmailSurveyPlugin {
                 currentAngle += sliceAngle;
             });
             
+                       
             // Agregar sombra al círculo
             ctx.shadowColor = 'rgba(0,0,0,0.1)';
             ctx.shadowBlur = 10;
@@ -1477,48 +2059,6 @@ class EmailSurveyPlugin {
         return $count;
     }
     
-    public function display_csv_status() {
-        global $wpdb;
-        $table_emails = $wpdb->prefix . 'survey_valid_emails';
-        
-        $total_emails = $wpdb->get_var("SELECT COUNT(*) FROM $table_emails");
-        $recent_emails = $wpdb->get_results("SELECT email, created_at FROM $table_emails ORDER BY created_at DESC LIMIT 10");
-        
-        if ($total_emails > 0) {
-            echo '<div style="color: #155724; background-color: #d4edda; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
-            echo '<strong>✅ CSV Cargado Correctamente</strong><br>';
-            echo "Total de emails válidos: <strong>$total_emails</strong><br>";
-            echo "Última actualización: " . ($recent_emails ? date('d/m/Y H:i:s', strtotime($recent_emails[0]->created_at)) : 'N/A');
-            echo '</div>';
-            
-            if ($recent_emails) {
-                echo '<div class="csv-preview">';
-                echo '<h5>Últimos emails cargados:</h5>';
-                echo '<div style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: white;">';
-                
-                foreach ($recent_emails as $email_record) {
-                    echo '<div style="padding: 3px 0; border-bottom: 1px solid #eee; font-size: 12px;">';
-                    echo esc_html($email_record->email) . ' <span style="color: #999;">(' . date('d/m H:i', strtotime($email_record->created_at)) . ')</span>';
-                    echo '</div>';
-                }
-                
-                echo '</div>';
-                
-                if ($total_emails > 10) {
-                    echo '<p style="font-size: 11px; color: #666; margin-top: 5px;">... y ' . ($total_emails - 10) . ' emails más</p>';
-                }
-                
-                echo '</div>';
-            }
-            
-        } else {
-            echo '<div style="color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 4px;">';
-            echo '<strong>⚠️ No hay emails cargados</strong><br>';
-            echo 'Debes subir un archivo CSV para poder enviar encuestas por email.';
-            echo '</div>';
-        }
-    }
-    
     public function clear_csv() {
         if (!wp_verify_nonce($_POST['nonce'], 'csv_nonce')) {
             wp_die('Acceso denegado');
@@ -1530,95 +2070,12 @@ class EmailSurveyPlugin {
         $result = $wpdb->query("TRUNCATE TABLE $table_emails");
         
         if ($result !== false) {
-            wp_send_json_success('Lista de emails limpiada exitosamente');
+            wp_send_json_success('Lista de participantes limpiada exitosamente');
         } else {
-            wp_send_json_error('Error al limpiar la lista de emails');
+            wp_send_json_error('Error al limpiar la lista de participantes');
         }
     }
     
-    public function submit_vote() {
-        error_log('DEBUG: submit_vote called with POST: ' . print_r($_POST, true));
-        
-        // Verificar nonce
-        if (!wp_verify_nonce($_POST['nonce'], 'vote_nonce')) {
-            error_log('DEBUG: Nonce verification failed');
-            wp_send_json_error('Acceso denegado - nonce inválido');
-        }
-        
-        $survey_id = intval($_POST['survey_id']);
-        $email = sanitize_email($_POST['email']);
-        $option = intval($_POST['option']);
-        
-        error_log("DEBUG: Processed values - survey_id=$survey_id, email=$email, option=$option");
-        
-        // Validaciones básicas
-        if (!$survey_id || !$email || !$option) {
-            error_log('DEBUG: Missing required parameters');
-            wp_send_json_error('Parámetros faltantes');
-        }
-        
-        // Validar email
-        if (!$this->is_valid_email($email)) {
-            error_log('DEBUG: Email not valid');
-            wp_send_json_error('Email no autorizado');
-        }
-        
-        // Verificar si ya acertó (completó la encuesta)
-        if ($this->has_voted($survey_id, $email)) {
-            error_log('DEBUG: User already completed survey');
-            wp_send_json_error('Ya has completado esta encuesta exitosamente');
-        }
-        
-        // Verificar intentos restantes
-        $attempts = $this->get_attempt_count($survey_id, $email);
-        $max_attempts = 3;
-        
-        error_log("DEBUG: Current attempts: $attempts, max: $max_attempts");
-        
-        if ($attempts >= $max_attempts) {
-            error_log('DEBUG: Max attempts reached');
-            wp_send_json_error('Has agotado todos tus intentos');
-        }
-        
-        global $wpdb;
-        $table_surveys = $wpdb->prefix . 'email_surveys';
-        $table_votes = $wpdb->prefix . 'survey_votes';
-        
-        $survey = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_surveys WHERE id = %d", $survey_id));
-        if (!$survey) {
-            error_log('DEBUG: Survey not found');
-            wp_send_json_error('Encuesta no encontrada');
-        }
-        
-        $is_correct = ($option == $survey->correct_answer) ? 1 : 0;
-        error_log("DEBUG: Is correct: $is_correct (selected: $option, correct: {$survey->correct_answer})");
-        
-        // SIEMPRE registrar el voto (correcto o incorrecto)
-        $result = $wpdb->insert(
-            $table_votes,
-            array(
-                'survey_id' => $survey_id,
-                'email' => $email,
-                'selected_option' => $option,
-                'is_correct' => $is_correct
-            ),
-            array('%d', '%s', '%d', '%d')
-        );
-        
-        if ($result === false) {
-            error_log('DEBUG: Database insert failed: ' . $wpdb->last_error);
-            wp_send_json_error('Error al registrar el voto: ' . $wpdb->last_error);
-        }
-        
-        error_log('DEBUG: Vote registered successfully');
-        wp_send_json_success(array(
-            'is_correct' => $is_correct,
-            'attempts' => $attempts + 1,
-            'message' => $is_correct ? 'Respuesta correcta' : 'Respuesta incorrecta'
-        ));
-    }
-
-    // También agregar la función reset_plugin que está faltando
     public function reset_plugin() {
         if (!wp_verify_nonce($_POST['nonce'], 'reset_nonce')) {
             wp_die('Acceso denegado');
@@ -1637,9 +2094,9 @@ class EmailSurveyPlugin {
                 $table_votes = $wpdb->prefix . 'survey_votes';
                 $result = $wpdb->query("TRUNCATE TABLE $table_votes");
                 if ($result !== false) {
-                    wp_send_json_success('Votos eliminados exitosamente');
+                    wp_send_json_success('Respuestas eliminadas exitosamente');
                 } else {
-                    wp_send_json_error('Error al eliminar votos');
+                    wp_send_json_error('Error al eliminar respuestas');
                 }
                 break;
                 
@@ -1647,9 +2104,9 @@ class EmailSurveyPlugin {
                 $table_emails = $wpdb->prefix . 'survey_valid_emails';
                 $result = $wpdb->query("TRUNCATE TABLE $table_emails");
                 if ($result !== false) {
-                    wp_send_json_success('Emails eliminados exitosamente');
+                    wp_send_json_success('Participantes eliminados exitosamente');
                 } else {
-                    wp_send_json_error('Error al eliminar emails');
+                    wp_send_json_error('Error al eliminar participantes');
                 }
                 break;
                 
@@ -1659,9 +2116,9 @@ class EmailSurveyPlugin {
                 $wpdb->query("TRUNCATE TABLE $table_votes");
                 $result = $wpdb->query("TRUNCATE TABLE $table_surveys");
                 if ($result !== false) {
-                    wp_send_json_success('Encuestas eliminadas exitosamente');
+                    wp_send_json_success('Preguntas eliminadas exitosamente');
                 } else {
-                    wp_send_json_error('Error al eliminar encuestas');
+                    wp_send_json_error('Error al eliminar preguntas');
                 }
                 break;
                 
@@ -1694,6 +2151,88 @@ class EmailSurveyPlugin {
         }
     }
     
+    public function submit_vote() {
+        error_log('DEBUG: submit_vote called with POST: ' . print_r($_POST, true));
+        
+        // Verificar nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'vote_nonce')) {
+            error_log('DEBUG: Nonce verification failed');
+            wp_send_json_error('Acceso denegado - nonce inválido');
+        }
+        
+        $survey_id = intval($_POST['survey_id']);
+        $email = sanitize_email($_POST['email']);
+        $option = intval($_POST['option']);
+        
+        error_log("DEBUG: Processed values - survey_id=$survey_id, email=$email, option=$option");
+        
+        // Validaciones básicas
+        if (!$survey_id || !$email || !$option) {
+            error_log('DEBUG: Missing required parameters');
+            wp_send_json_error('Parámetros faltantes');
+        }
+        
+        // Validar email
+        if (!$this->is_valid_email($email)) {
+            error_log('DEBUG: Email not valid');
+            wp_send_json_error('Email no autorizado');
+        }
+        
+        // Verificar si ya acertó (completó la pregunta)
+        if ($this->has_voted($survey_id, $email)) {
+            error_log('DEBUG: User already completed survey');
+            wp_send_json_error('Ya has completado esta pregunta exitosamente');
+        }
+        
+        // Verificar intentos restantes
+        $attempts = $this->get_attempt_count($survey_id, $email);
+        $max_attempts = 3;
+        
+        error_log("DEBUG: Current attempts: $attempts, max: $max_attempts");
+        
+        if ($attempts >= $max_attempts) {
+            error_log('DEBUG: Max attempts reached');
+            wp_send_json_error('Has agotado todos tus intentos');
+        }
+        
+        global $wpdb;
+        $table_surveys = $wpdb->prefix . 'email_surveys';
+        $table_votes = $wpdb->prefix . 'survey_votes';
+        
+        $survey = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_surveys WHERE id = %d", $survey_id));
+        if (!$survey) {
+            error_log('DEBUG: Survey not found');
+            wp_send_json_error('Pregunta no encontrada');
+        }
+        
+        $is_correct = ($option == $survey->correct_answer) ? 1 : 0;
+        error_log("DEBUG: Is correct: $is_correct (selected: $option, correct: {$survey->correct_answer})");
+        
+        // SIEMPRE registrar el voto (correcto o incorrecto)
+        $result = $wpdb->insert(
+            $table_votes,
+            array(
+                'survey_id' => $survey_id,
+                'email' => $email,
+                'selected_option' => $option,
+                'is_correct' => $is_correct
+            ),
+            array('%d', '%s', '%d', '%d')
+        );
+        
+        if ($result === false) {
+            error_log('DEBUG: Database insert failed: ' . $wpdb->last_error);
+            wp_send_json_error('Error al registrar el voto: ' . $wpdb->last_error);
+        }
+        
+        error_log('DEBUG: Vote registered successfully');
+        wp_send_json_success(array(
+            'is_correct' => $is_correct,
+            'attempts' => $attempts + 1,
+            'message' => $is_correct ? 'Respuesta correcta' : 'Respuesta incorrecta'
+        ));
+    }
+
     // Agregar esta función que está faltando (después de on_deactivation())
     public function force_survey_page() {
         // Verificar si estamos en la página de encuesta o resultados
@@ -1718,4 +2257,6 @@ class EmailSurveyPlugin {
         }
     }
 }
+
+// Instanciar el plugin
 $email_survey_plugin = new EmailSurveyPlugin();
