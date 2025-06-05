@@ -4,11 +4,24 @@
  * Description: Sistema de encuestas por email con validación CSV
  * Version: 1.0
  * Author: Daniel Avila
+ * Requires at least: 5.0
+ * Tested up to: 6.4
+ * Requires PHP: 8.1
+ * Text Domain: teva-preguntas
  */
 
 // Prevenir acceso directo
 if (!defined('ABSPATH')) {
     exit;
+}
+
+// Función auxiliar para debug interno (solo CLI)
+function teva_debug_log($message) {
+    // Solo log en CLI o si WP_DEBUG está activo y el usuario es admin
+    if (defined('WP_CLI') && WP_CLI || 
+        (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options'))) {
+        error_log('TEVA Plugin: ' . $message);
+    }
 }
 
 // Hook de desinstalación
@@ -22,7 +35,7 @@ function email_survey_plugin_uninstall() {
         $wpdb->prefix . 'email_surveys',
         $wpdb->prefix . 'survey_valid_emails',
         $wpdb->prefix . 'survey_votes',
-        $wpdb->prefix . 'survey_sessions' // Nueva tabla de sesiones
+        $wpdb->prefix . 'survey_sessions'
     );
     
     foreach ($tables as $table) {
@@ -37,8 +50,7 @@ function email_survey_plugin_uninstall() {
     $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_email_survey_%'");
     $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_email_survey_%'");
     
-    // Log de desinstalación para debug
-    error_log('Email Survey Plugin: Desinstalación completada - Todas las tablas y datos eliminados');
+    teva_debug_log('Desinstalación completada - Todas las tablas y datos eliminados');
 }
 
 class EmailSurveyPlugin {
@@ -49,7 +61,7 @@ class EmailSurveyPlugin {
         add_action('wp_ajax_save_survey', array($this, 'save_survey'));
         add_action('wp_ajax_upload_csv', array($this, 'upload_csv'));
         add_action('wp_ajax_clear_csv', array($this, 'clear_csv'));
-        add_action('wp_ajax_reset_plugin', array($this, 'reset_plugin')); // Nuevo endpoint para reset
+        add_action('wp_ajax_reset_plugin', array($this, 'reset_plugin')); // Asegúrate de que esté aquí
         add_action('wp_ajax_nopriv_submit_vote', array($this, 'submit_vote'));
         add_action('wp_ajax_submit_vote', array($this, 'submit_vote'));
         add_shortcode('survey_form', array($this, 'survey_form_shortcode'));
@@ -60,6 +72,28 @@ class EmailSurveyPlugin {
         
         // Hook de desactivación (opcional, para limpiar temporales)
         register_deactivation_hook(__FILE__, array($this, 'on_deactivation'));
+        
+        // AGREGAR: Enqueue scripts en admin
+        add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
+    }
+    
+    // NUEVA FUNCIÓN: Cargar scripts de admin
+    public function admin_scripts($hook) {
+        // Solo cargar en nuestra página
+        if ($hook !== 'toplevel_page_teva-preguntas') {
+            return;
+        }
+        
+        // Asegurar que jQuery esté disponible
+        wp_enqueue_script('jquery');
+        
+        // Localizar el script con variables necesarias
+        wp_localize_script('jquery', 'tevaAjax', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'reset_nonce' => wp_create_nonce('reset_nonce'),
+            'survey_nonce' => wp_create_nonce('survey_nonce'),
+            'csv_nonce' => wp_create_nonce('csv_nonce')
+        ));
     }
     
     public function on_deactivation() {
@@ -67,7 +101,7 @@ class EmailSurveyPlugin {
         global $wpdb;
         $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_email_survey_%'");
         $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_email_survey_%'");
-        error_log('Email Survey Plugin: Plugin desactivado - Transients limpiados');
+        teva_debug_log('Plugin desactivado - Transients limpiados');
     }
     
     public function init() {
@@ -140,15 +174,15 @@ class EmailSurveyPlugin {
         // Método compatible con MySQL 8.0 para verificar y eliminar índices
         $indexes = $wpdb->get_results("SHOW INDEX FROM $table_votes WHERE Key_name = 'unique_vote'");
         if (!empty($indexes)) {
-            error_log('DEBUG: Found unique_vote index, attempting to remove it');
+            teva_debug_log('Found unique_vote index, attempting to remove it');
             $result = $wpdb->query("ALTER TABLE $table_votes DROP INDEX unique_vote");
             if ($result === false) {
-                error_log('DEBUG: Failed to drop unique_vote index: ' . $wpdb->last_error);
+                teva_debug_log('Failed to drop unique_vote index: ' . $wpdb->last_error);
             } else {
-                error_log('DEBUG: Successfully dropped unique_vote index');
+                teva_debug_log('Successfully dropped unique_vote index');
             }
         } else {
-            error_log('DEBUG: No unique_vote index found, table is clean');
+            teva_debug_log('No unique_vote index found, table is clean');
         }
         
         // Guardar versión para futuras migraciones
@@ -198,6 +232,19 @@ class EmailSurveyPlugin {
                     
                     <div style="margin-top: 15px; font-size: 12px; color: #666;">
                         <p><strong>Nota:</strong> Estas acciones no se pueden deshacer. Siempre haz una copia de seguridad antes de usar estas herramientas.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Debug Info -->
+            <div class="postbox" style="margin-top: 20px;">
+                <h2 class="hndle">🔍 Debug Info</h2>
+                <div class="inside">
+                    <div id="debug-info" style="background: #f1f1f1; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                        AJAX URL: <?php echo admin_url('admin-ajax.php'); ?><br>
+                        Current User Can Manage: <?php echo current_user_can('manage_options') ? 'YES' : 'NO'; ?><br>
+                        WordPress Version: <?php echo get_bloginfo('version'); ?><br>
+                        Plugin Path: <?php echo plugin_dir_path(__FILE__); ?>
                     </div>
                 </div>
             </div>
@@ -276,8 +323,12 @@ class EmailSurveyPlugin {
         
         <script>
         jQuery(document).ready(function($) {
+            console.log('TEVA Admin Script Loaded');
+            console.log('AJAX URL:', '<?php echo admin_url('admin-ajax.php'); ?>');
+            
             // Función para reset de respuestas
             $('#reset-votes-btn').on('click', function() {
+                console.log('Reset votes button clicked');
                 if (!confirm('¿Estás seguro? Esto eliminará TODAS las respuestas pero mantendrá las preguntas y participantes.')) return;
                 if (!confirm('Esta acción NO se puede deshacer. ¿Continuar?')) return;
                 
@@ -286,6 +337,7 @@ class EmailSurveyPlugin {
             
             // Función para reset de participantes
             $('#reset-emails-btn').on('click', function() {
+                console.log('Reset emails button clicked');
                 if (!confirm('¿Estás seguro? Esto eliminará TODOS los participantes válidos.')) return;
                 if (!confirm('Esta acción NO se puede deshacer. ¿Continuar?')) return;
                 
@@ -294,6 +346,7 @@ class EmailSurveyPlugin {
             
             // Función para reset de preguntas
             $('#reset-surveys-btn').on('click', function() {
+                console.log('Reset surveys button clicked');
                 if (!confirm('¿Estás seguro? Esto eliminará TODAS las preguntas y sus respuestas asociadas.')) return;
                 if (!confirm('Esta acción NO se puede deshacer. ¿Continuar?')) return;
                 
@@ -302,6 +355,7 @@ class EmailSurveyPlugin {
             
             // Función para reset completo
             $('#reset-all-btn').on('click', function() {
+                console.log('Reset all button clicked');
                 if (!confirm('⚠️ PELIGRO: Esto eliminará TODO (preguntas, participantes, respuestas). ¿Estás seguro?')) return;
                 if (!confirm('🚨 ÚLTIMA CONFIRMACIÓN: Esta acción borrará TODOS los datos del plugin. ¿Continuar?')) return;
                 
@@ -309,25 +363,47 @@ class EmailSurveyPlugin {
             });
             
             function resetData(type, successMessage) {
+                console.log('Reset function called with type:', type);
+                
                 var btn = $('#reset-' + (type === 'all' ? 'all' : type) + '-btn');
                 var originalText = btn.text();
                 btn.text('Procesando...').prop('disabled', true);
                 
-                $.post(ajaxurl, {
+                var postData = {
                     action: 'reset_plugin',
                     reset_type: type,
                     nonce: '<?php echo wp_create_nonce("reset_nonce"); ?>'
-                }, function(response) {
-                    if(response.success) {
-                        alert(successMessage);
-                        location.reload();
-                    } else {
-                        alert('Error: ' + response.data);
+                };
+                
+                console.log('Sending AJAX request:', postData);
+                
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: postData,
+                    dataType: 'json',
+                    timeout: 30000,
+                    success: function(response) {
+                        console.log('AJAX Success Response:', response);
+                        if(response.success) {
+                            alert(successMessage);
+                            location.reload();
+                        } else {
+                            alert('Error: ' + (response.data || 'Error desconocido'));
+                            console.error('Server Error:', response.data);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        alert('Error de conexión: ' + error + '\nRevisa la consola para más detalles.');
+                    },
+                    complete: function() {
+                        btn.text(originalText).prop('disabled', false);
                     }
-                    btn.text(originalText).prop('disabled', false);
-                }).fail(function() {
-                    alert('Error de conexión');
-                    btn.text(originalText).prop('disabled', false);
                 });
             }
             
@@ -546,8 +622,8 @@ class EmailSurveyPlugin {
     }
     
     public function survey_form_shortcode($atts) {
-        error_log('DEBUG: survey_form_shortcode called');
-        error_log('DEBUG: GET params: ' . print_r($_GET, true));
+        teva_debug_log('survey_form_shortcode called');
+        teva_debug_log('GET params: ' . print_r($_GET, true));
         
         // NUEVO FLUJO: Mantenemos URLs obvias para el inicio, luego redirigimos
         $survey_id = 0;
@@ -557,10 +633,11 @@ class EmailSurveyPlugin {
         // 1. PRIMERA ENTRADA: URLs obvias desde email
         if (isset($_GET['survey']) && isset($_GET['email'])) {
             $survey_id = intval($_GET['survey']);
-            $email = sanitize_email($_GET['email']);
+            // DECODIFICAR URL antes de sanitizar
+            $email = sanitize_email(urldecode($_GET['email']));
             $preselected_option = isset($_GET['option']) ? intval($_GET['option']) : 0;
             
-            error_log("DEBUG: Direct URL access - survey_id=$survey_id, email=$email, option=$preselected_option");
+            teva_debug_log("Direct URL access - survey_id=$survey_id, email=$email, option=$preselected_option");
             
             // Validar email inmediatamente
             if (!$this->is_valid_email($email)) {
@@ -608,6 +685,55 @@ class EmailSurveyPlugin {
             return ob_get_clean();
         }
         
+        // AGREGAR: Manejar caso donde no hay survey_id pero sí hay email (URL del email)
+        if (!isset($_GET['survey']) && isset($_GET['email'])) {
+            // URL desde email sin survey_id especificado - buscar encuesta activa
+            $email = sanitize_email(urldecode($_GET['email']));
+            $preselected_option = isset($_GET['option']) ? intval($_GET['option']) : 0;
+            
+            // Buscar la encuesta activa más reciente
+            global $wpdb;
+            $table_surveys = $wpdb->prefix . 'email_surveys';
+            $active_survey = $wpdb->get_row("SELECT id FROM $table_surveys WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1");
+            
+            if ($active_survey) {
+                $survey_id = $active_survey->id;
+                
+                teva_debug_log("Email URL without survey_id - found active survey: $survey_id, email: $email, option: $preselected_option");
+                
+                // Validar email
+                if (!$this->is_valid_email($email)) {
+                    return '<div style="padding: 20px; border: 2px solid orange;"><p><strong>ERROR:</strong> Email no autorizado para participar en esta encuesta.</p><p>Email verificado: ' . $email . '</p></div>';
+                }
+                
+                // Crear sesión y redirigir
+                $session_token = $this->create_session_token($survey_id, $email);
+                $clean_url = home_url('/encuesta/?survey=' . $session_token);
+                if ($preselected_option) {
+                    $clean_url .= '&option=' . $preselected_option;
+                }
+                
+                // Redirección inmediata
+                ob_start();
+                ?>
+                <div style="padding: 20px; text-align: center; border: 2px solid #28a745;">
+                    <h3>✅ Email detectado</h3>
+                    <p>Redirigiendo a la encuesta activa...</p>
+                </div>
+                
+                <script>
+                document.cookie = 'survey_session=<?php echo $session_token; ?>; path=/; max-age=86400; secure=false; samesite=strict';
+                setTimeout(function() {
+                    window.location.href = '<?php echo $clean_url; ?>';
+                }, 1000);
+                </script>
+                <?php
+                return ob_get_clean();
+            } else {
+                return '<div style="padding: 20px; border: 2px solid red;"><p><strong>ERROR:</strong> No hay encuestas activas disponibles.</p></div>';
+            }
+        }
+        
         // 2. ACCESO POR SESIÓN: URLs con token en parámetro 'survey'
         if (isset($_GET['survey']) && !isset($_GET['email'])) {
             // El parámetro 'survey' contiene el token, no el ID
@@ -618,7 +744,7 @@ class EmailSurveyPlugin {
                 $survey_id = $session_data['survey_id'];
                 $email = $session_data['email'];
                 $preselected_option = isset($_GET['option']) ? intval($_GET['option']) : 0;
-                error_log("DEBUG: Session access via survey param - survey_id=$survey_id, email=$email, option=$preselected_option");
+                teva_debug_log("Session access via survey param - survey_id=$survey_id, email=$email, option=$preselected_option");
             }
         }
         
@@ -628,7 +754,7 @@ class EmailSurveyPlugin {
             if ($session_data) {
                 $survey_id = $session_data['survey_id'];
                 $email = $session_data['email'];
-                error_log("DEBUG: Cookie fallback - survey_id=$survey_id, email=$email");
+                teva_debug_log("Cookie fallback - survey_id=$survey_id, email=$email");
             }
         }
         
@@ -1013,7 +1139,7 @@ class EmailSurveyPlugin {
         $survey_id = $session_data['survey_id'];
         $email = $session_data['email'];
         
-        error_log("DEBUG: Results page - survey_id=$survey_id, email=$email");
+        teva_debug_log("Results page - survey_id=$survey_id, email=$email");
         
         global $wpdb;
         $table_surveys = $wpdb->prefix . 'email_surveys';
@@ -1722,7 +1848,7 @@ class EmailSurveyPlugin {
         
         .result-message.incorrect {
             background: linear-gradient(135deg, #f8d7da 0%, #f1b0b7 100%);
-            border: 2px solid #dc3545;
+                       border: 2px solid #dc3545;
             color: #721c24;
         }
         
@@ -1813,7 +1939,7 @@ class EmailSurveyPlugin {
         .legend-text {
             flex: 1;
             text-align: left;
-            font-weight: 500;
+            font-weight:  500;
             color: #495057;
         }
         
@@ -2077,110 +2203,134 @@ class EmailSurveyPlugin {
     }
     
     public function reset_plugin() {
-        if (!wp_verify_nonce($_POST['nonce'], 'reset_nonce')) {
-            wp_die('Acceso denegado');
+        // Debug log
+        teva_debug_log('Reset plugin function called');
+        teva_debug_log('POST data: ' . print_r($_POST, true));
+        
+        // Verificar nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'reset_nonce')) {
+            teva_debug_log('Nonce verification failed');
+            wp_send_json_error('Acceso denegado - Nonce inválido');
+            return;
         }
         
+        // Verificar permisos
         if (!current_user_can('manage_options')) {
+            teva_debug_log('Insufficient permissions');
             wp_send_json_error('Permisos insuficientes');
+            return;
         }
         
-        $reset_type = sanitize_text_field($_POST['reset_type']);
+        $reset_type = isset($_POST['reset_type']) ? sanitize_text_field($_POST['reset_type']) : '';
+        
+        if (empty($reset_type)) {
+            teva_debug_log('No reset type provided');
+            wp_send_json_error('Tipo de reset no especificado');
+            return;
+        }
+        
+        teva_debug_log('Processing reset type: ' . $reset_type);
         
         global $wpdb;
         
-        switch ($reset_type) {
-            case 'votes':
-                $table_votes = $wpdb->prefix . 'survey_votes';
-                $result = $wpdb->query("TRUNCATE TABLE $table_votes");
-                if ($result !== false) {
-                    wp_send_json_success('Respuestas eliminadas exitosamente');
-                } else {
-                    wp_send_json_error('Error al eliminar respuestas');
-                }
-                break;
-                
-            case 'emails':
-                $table_emails = $wpdb->prefix . 'survey_valid_emails';
-                $result = $wpdb->query("TRUNCATE TABLE $table_emails");
-                if ($result !== false) {
-                    wp_send_json_success('Participantes eliminados exitosamente');
-                } else {
-                    wp_send_json_error('Error al eliminar participantes');
-                }
-                break;
-                
-            case 'surveys':
-                $table_surveys = $wpdb->prefix . 'email_surveys';
-                $table_votes = $wpdb->prefix . 'survey_votes';
-                $wpdb->query("TRUNCATE TABLE $table_votes");
-                $result = $wpdb->query("TRUNCATE TABLE $table_surveys");
-                if ($result !== false) {
-                    wp_send_json_success('Preguntas eliminadas exitosamente');
-                } else {
-                    wp_send_json_error('Error al eliminar preguntas');
-                }
-                break;
-                
-            case 'all':
-                $tables = array(
-                    $wpdb->prefix . 'email_surveys',
-                    $wpdb->prefix . 'survey_valid_emails',
-                    $wpdb->prefix . 'survey_votes',
-                    $wpdb->prefix . 'survey_sessions'
-                );
-                
-                $success = true;
-                foreach ($tables as $table) {
-                    $result = $wpdb->query("TRUNCATE TABLE $table");
-                    if ($result === false) {
-                        $success = false;
-                        break;
+        try {
+            switch ($reset_type) {
+                case 'votes':
+                    $table_votes = $wpdb->prefix . 'survey_votes';
+                    $result = $wpdb->query("TRUNCATE TABLE `$table_votes`");
+                    teva_debug_log('Votes reset result: ' . ($result !== false ? 'SUCCESS' : 'FAILED'));
+                    if ($result !== false) {
+                        wp_send_json_success('Respuestas eliminadas exitosamente');
+                    } else {
+                        wp_send_json_error('Error al eliminar respuestas: ' . $wpdb->last_error);
                     }
-                }
-                
-                if ($success) {
-                    wp_send_json_success('Plugin reiniciado completamente');
-                } else {
-                    wp_send_json_error('Error al reiniciar el plugin');
-                }
-                break;
-                
-            default:
-                wp_send_json_error('Tipo de reset no válido');
+                    break;
+                    
+                case 'emails':
+                    $table_emails = $wpdb->prefix . 'survey_valid_emails';
+                    $result = $wpdb->query("TRUNCATE TABLE `$table_emails`");
+                    teva_debug_log('Emails reset result: ' . ($result !== false ? 'SUCCESS' : 'FAILED'));
+                    if ($result !== false) {
+                        wp_send_json_success('Participantes eliminados exitosamente');
+                    } else {
+                        wp_send_json_error('Error al eliminar participantes: ' . $wpdb->last_error);
+                    }
+                    break;
+                    
+                case 'surveys':
+                    $table_surveys = $wpdb->prefix . 'email_surveys';
+                    $table_votes = $wpdb->prefix . 'survey_votes';
+                    $wpdb->query("TRUNCATE TABLE `$table_votes`");
+                    $result = $wpdb->query("TRUNCATE TABLE `$table_surveys`");
+                    teva_debug_log('Surveys reset result: ' . ($result !== false ? 'SUCCESS' : 'FAILED'));
+                    if ($result !== false) {
+                        wp_send_json_success('Preguntas eliminadas exitosamente');
+                    } else {
+                        wp_send_json_error('Error al eliminar preguntas: ' . $wpdb->last_error);
+                    }
+                    break;
+                    
+                case 'all':
+                    $tables = array(
+                        $wpdb->prefix . 'email_surveys',
+                        $wpdb->prefix . 'survey_valid_emails',
+                        $wpdb->prefix . 'survey_votes',
+                        $wpdb->prefix . 'survey_sessions'
+                    );
+                    
+                    $success = true;
+                    $errors = array();
+                    
+                    foreach ($tables as $table) {
+                        $result = $wpdb->query("TRUNCATE TABLE `$table`");
+                        if ($result === false) {
+                            $success = false;
+                            $errors[] = "Error en tabla $table: " . $wpdb->last_error;
+                        }
+                    }
+                    
+                    teva_debug_log('Full reset result: ' . ($success ? 'SUCCESS' : 'FAILED'));
+                    teva_debug_log('Reset errors: ' . print_r($errors, true));
+                    
+                    if ($success) {
+                        wp_send_json_success('Plugin reiniciado completamente');
+                    } else {
+                        wp_send_json_error('Error al reiniciar: ' . implode(', ', $errors));
+                    }
+                    break;
+                    
+                default:
+                    teva_debug_log('Invalid reset type: ' . $reset_type);
+                    wp_send_json_error('Tipo de reset no válido');
+            }
+        } catch (Exception $e) {
+            teva_debug_log('Exception in reset_plugin: ' . $e->getMessage());
+            wp_send_json_error('Error interno: ' . $e->getMessage());
         }
     }
-    
+
     public function submit_vote() {
-        error_log('DEBUG: submit_vote called with POST: ' . print_r($_POST, true));
-        
         // Verificar nonce
         if (!wp_verify_nonce($_POST['nonce'], 'vote_nonce')) {
-            error_log('DEBUG: Nonce verification failed');
-            wp_send_json_error('Acceso denegado - nonce inválido');
+            wp_send_json_error('Acceso denegado');
         }
         
         $survey_id = intval($_POST['survey_id']);
         $email = sanitize_email($_POST['email']);
         $option = intval($_POST['option']);
         
-        error_log("DEBUG: Processed values - survey_id=$survey_id, email=$email, option=$option");
-        
         // Validaciones básicas
         if (!$survey_id || !$email || !$option) {
-            error_log('DEBUG: Missing required parameters');
             wp_send_json_error('Parámetros faltantes');
         }
         
         // Validar email
         if (!$this->is_valid_email($email)) {
-            error_log('DEBUG: Email not valid');
             wp_send_json_error('Email no autorizado');
         }
         
         // Verificar si ya acertó (completó la pregunta)
         if ($this->has_voted($survey_id, $email)) {
-            error_log('DEBUG: User already completed survey');
             wp_send_json_error('Ya has completado esta pregunta exitosamente');
         }
         
@@ -2188,10 +2338,7 @@ class EmailSurveyPlugin {
         $attempts = $this->get_attempt_count($survey_id, $email);
         $max_attempts = 3;
         
-        error_log("DEBUG: Current attempts: $attempts, max: $max_attempts");
-        
         if ($attempts >= $max_attempts) {
-            error_log('DEBUG: Max attempts reached');
             wp_send_json_error('Has agotado todos tus intentos');
         }
         
@@ -2201,12 +2348,10 @@ class EmailSurveyPlugin {
         
         $survey = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_surveys WHERE id = %d", $survey_id));
         if (!$survey) {
-            error_log('DEBUG: Survey not found');
             wp_send_json_error('Pregunta no encontrada');
         }
         
         $is_correct = ($option == $survey->correct_answer) ? 1 : 0;
-        error_log("DEBUG: Is correct: $is_correct (selected: $option, correct: {$survey->correct_answer})");
         
         // SIEMPRE registrar el voto (correcto o incorrecto)
         $result = $wpdb->insert(
@@ -2221,11 +2366,12 @@ class EmailSurveyPlugin {
         );
         
         if ($result === false) {
-            error_log('DEBUG: Database insert failed: ' . $wpdb->last_error);
-            wp_send_json_error('Error al registrar el voto: ' . $wpdb->last_error);
+            teva_debug_log('Error al insertar voto: ' . $wpdb->last_error);
+            wp_send_json_error('Error al registrar el voto');
         }
         
-        error_log('DEBUG: Vote registered successfully');
+        teva_debug_log("Voto registrado - Survey: $survey_id, Email: $email, Opción: $option, Correcto: $is_correct");
+        
         wp_send_json_success(array(
             'is_correct' => $is_correct,
             'attempts' => $attempts + 1,
@@ -2233,21 +2379,11 @@ class EmailSurveyPlugin {
         ));
     }
 
-    // Agregar esta función que está faltando (después de on_deactivation())
     public function force_survey_page() {
-        // Verificar si estamos en la página de encuesta o resultados
         $request_uri = $_SERVER['REQUEST_URI'];
         
-        // Debug
-        error_log('DEBUG: force_survey_page called with URI: ' . $request_uri);
-        
-        // Si estamos en /encuesta/ o /resultados/, forzar que se muestre el contenido
         if (strpos($request_uri, '/encuesta/') !== false || strpos($request_uri, '/resultados/') !== false) {
-            // Verificar si hay parámetros de encuesta
             if (isset($_GET['survey']) || isset($_GET['s'])) {
-                error_log('DEBUG: Survey page detected, forcing content display');
-                
-                // Opcional: Forzar que WordPress no muestre 404
                 global $wp_query;
                 if (isset($wp_query)) {
                     $wp_query->is_404 = false;

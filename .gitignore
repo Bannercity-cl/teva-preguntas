@@ -1,3 +1,106 @@
+# Archivos sensibles y datos
 *.csv
 *.zip
-*.yml
+*.tar.gz
+*.rar
+
+# Configuración de contenedores
+docker-compose.yml
+docker-compose.*.yml
+*.env
+.env*
+
+# Scripts de deployment
+*.sh
+deploy.sh
+backup.sh
+create_zip.sh
+
+# Logs y debugging
+*.log
+debug.log
+error.log
+access.log
+
+# Base de datos
+*.sql
+*.db
+*.sqlite
+*.dump
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# Archivos del sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDEs y editores
+.vscode/
+.idea/
+*.sublime-*
+*.code-workspace
+
+# Node.js (si se usa para build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Composer (si se usa)
+vendor/
+composer.lock
+
+# WordPress específico
+wp-config.php
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/backup*/
+wp-content/backups/
+wp-content/cache/
+
+# Plugin builds y distribución
+dist/
+build/
+*.min.js
+*.min.css
+
+# Archivos de respaldo
+backup-*
+*-backup
+*.backup
+
+# Archivos de configuración local
+local-config.php
+.htaccess.local
+robots.txt.local
+
+# Archivos de prueba
+test-*
+*-test
+phpunit.xml
+tests/
+
+# Certificados SSL
+*.pem
+*.key
+*.crt
+*.p12
+
+# Archivos de documentación temporal
+TODO.md
+NOTES.md
+*.draft
