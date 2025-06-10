@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TEVA Preguntas
  * Description: Sistema de encuestas por email con validación CSV
- * Version: 1.0
+ * Version: 1.1
  * Author: Daniel Avila
  * Requires at least: 5.0
  * Tested up to: 6.4
@@ -662,9 +662,6 @@ class EmailSurveyPlugin {
                 <!-- Header imagen -->
                 <div class="survey-header-image">
                     <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/images/header.jpg'; ?>" alt="TEVA Survey Header" />
-                    <div class="header-overlay">
-                        <h2>Iniciando Encuesta TEVA</h2>
-                    </div>
                 </div>
                 
                 <div class="loading-content">
@@ -929,22 +926,14 @@ class EmailSurveyPlugin {
         ob_start();
         ?>
         <div class="survey-container">
-            <!-- NUEVO: Header con imagen -->
+            <!-- Header con imagen -->
             <div class="survey-header-image">
                 <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/images/header.jpg'; ?>" alt="TEVA Survey Header" />
-                <div class="header-overlay">
-                    <div class="header-content">
-                        <h1>Encuesta TEVA</h1>
-                        <?php if (!empty($nombre)): ?>
-                            <p class="welcome-text">¡Bienvenido/a, <?php echo esc_html($nombre); ?>!</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
             </div>
             
             <!-- NUEVO: Estadísticas compactas siempre visibles -->
             <div class="compact-stats">
-                <h3>📊 Estadísticas en Tiempo Real</h3>
+                <h3>👥 ¿Cómo está votando el resto?</h3>
                 <div class="horizontal-chart">
                     <div class="chart-bar">
                         <div class="bar-segment option1" style="width: <?php echo $option1_percent; ?>%" title="<?php echo esc_attr($survey->option1); ?>: <?php echo $option1_percent; ?>%"></div>
@@ -1008,7 +997,11 @@ class EmailSurveyPlugin {
                     
                     <div class="submit-section">
                         <button type="submit" class="survey-submit-btn">
-                            📝 Enviar Respuesta
+                            <svg class="submit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                            </svg>
+                            Enviar Respuesta
                         </button>
                     </div>
                 </form>
@@ -1023,6 +1016,11 @@ class EmailSurveyPlugin {
                         <span>Intentos realizados: <?php echo $attempts; ?></span>
                     </div>
                 </div>
+            </div>
+            
+            <!-- NUEVO: Footer con imagen -->
+            <div class="survey-footer-image">
+                <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/images/bottom.png'; ?>" alt="TEVA Survey Footer" />
             </div>
         </div>
         
@@ -1083,6 +1081,48 @@ class EmailSurveyPlugin {
             text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
         }
         
+        /* NUEVO: Estilos para el footer con imagen */
+        .survey-footer-image {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        
+        .survey-footer-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        .footer-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .footer-content {
+            text-align: center;
+        }
+        
+        .footer-text {
+            color: white;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            opacity: 0.9;
+        }
+        
         .survey-content {
             padding: 30px;
         }
@@ -1092,31 +1132,30 @@ class EmailSurveyPlugin {
         }
         
         .question-section h2 {
-            color: #2c3e50;
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
             margin-bottom: 20px;
             font-size: 24px;
             line-height: 1.4;
         }
-        
-        /* NUEVO: Estilos para estadísticas compactas */
+
         .compact-stats {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             padding: 25px 30px;
             border-bottom: 1px solid #dee2e6;
         }
-        
+
         .compact-stats h3 {
-            color: #2c3e50;
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
             margin: 0 0 20px 0;
             font-size: 20px;
             text-align: center;
             font-weight: 600;
         }
-        
+
         .horizontal-chart {
             width: 100%;
         }
-        
+
         .chart-bar {
             width: 100%;
             height: 30px;
@@ -1127,23 +1166,23 @@ class EmailSurveyPlugin {
             margin-bottom: 20px;
             box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
         }
-        
+
         .bar-segment {
             height: 100%;
             transition: all 0.8s ease;
             position: relative;
         }
-        
+
         .bar-segment.option1 {
-            background: linear-gradient(90deg, #3498db, #2980b9);
+            background: linear-gradient(90deg, #074574, #053350);
         }
         
         .bar-segment.option2 {
-            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            background: linear-gradient(90deg, #ff7900, #cc6100);
         }
         
         .bar-segment.option3 {
-            background: linear-gradient(90deg, #f39c12, #d68910);
+            background: linear-gradient(90deg, #a2c551, #8ba544);
         }
         
         .chart-labels {
@@ -1151,7 +1190,7 @@ class EmailSurveyPlugin {
             grid-template-columns: 1fr 1fr 1fr;
             gap: 15px;
         }
-        
+
         .label-item {
             display: flex;
             align-items: center;
@@ -1164,37 +1203,177 @@ class EmailSurveyPlugin {
             min-height: 45px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        
+
         .label-color {
             width: 14px;
             height: 14px;
             border-radius: 50%;
             flex-shrink: 0;
         }
-        
+
         .label-color.option1-color {
-            background: #3498db;
+            background: #074574;
         }
         
         .label-color.option2-color {
-            background: #e74c3c;
+            background: #ff7900;
         }
         
         .label-color.option3-color {
-            background: #f39c12;
+            background: #a2c551;
         }
-        
+
         .label-text {
             flex: 1;
             font-weight: 500;
             color: #495057;
             line-height: 1.3;
         }
-        
+
         .label-percent {
             font-weight: bold;
-            color: #2c3e50;
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
             font-size: 12px;
+        }
+
+        .attempt-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .survey-options {
+            margin: 30px 0;
+        }
+
+        .survey-option {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin: 20px 0;
+            border: 3px solid #e9ecef;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .survey-option:hover {
+            border-color: #007cba;
+            box-shadow: 0 8px 25px rgba(0,124,186,0.15);
+            transform: translateY(-2px);
+        }
+
+        .survey-option.selected {
+            border-color: #007cba;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            box-shadow: 0 8px 25px rgba(0,124,186,0.2);
+        }
+
+        .survey-option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: #007cba;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 18px;
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
+            font-weight: 500;
+        }
+
+        .option-number {
+            background: #007cba;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .survey-submit-btn {
+            background: linear-gradient(135deg, #007cba 0%, #005a87 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 20px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 25px rgba(0,124,186,0.3);
+        }
+
+        .survey-submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,124,186,0.4);
+        }
+
+        .survey-submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .submit-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .survey-submit-btn:hover .submit-icon {
+            transform: rotate(15deg);
+        }
+
+        .session-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 14px;
+            border-left: 4px solid #28a745;
+        }
+
+        .session-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #015079; /* Cambiar de #155724 a #015079 */
+            font-weight: 500;
+        }
+        
+        /* También en la sección de resultados */
+        .results-content h2 {
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .question {
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 600; /* ANTES: con negrita */
         }
         
         /* Animación de entrada para el gráfico */
@@ -1206,144 +1385,12 @@ class EmailSurveyPlugin {
             from { width: 0; }
         }
         
-        .attempt-info {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            border: 1px solid #f39c12;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-radius: 10px;
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        .survey-options {
-            margin: 30px 0;
-        }
-        
-        .survey-option {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            padding: 25px;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            background: #fff;
-        }
-        
-        .survey-option:hover {
-            border-color: #007cba;
-            background: #f8f9fa;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,124,186,0.15);
-        }
-        
-        .survey-option.selected {
-            border-color: #007cba;
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            box-shadow: 0 6px 25px rgba(0,124,186,0.25);
-        }
-        
-        .survey-option input {
-            margin-right: 20px;
-            transform: scale(1.3);
-        }
-        
-        .option-text {
-            flex: 1;
-            font-size: 18px;
-            color: #2c3e50;
-            font-weight: 500;
-        }
-        
-        .option-number {
-            background: #6c757d;
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        
-        .survey-option.selected .option-number {
-            background: #007cba;
-        }
-        
-        .submit-section {
-            text-align: center;
-            margin: 40px 0;
-        }
-        
-        .survey-submit-btn {
-            background: linear-gradient(135deg, #007cba 0%, #005a87 100%);
-            color: white;
-            padding: 18px 50px;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0,124,186,0.3);
-        }
-        
-        .survey-submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,124,186,0.4);
-        }
-        
-        .survey-submit-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .session-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 30px;
-            padding: 18px;
-            background: #e8f5e8;
-            border-radius: 10px;
-            border-left: 5px solid #28a745;
-            font-size: 14px;
-        }
-        
-        .session-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #155724;
-            font-weight: 500;
-        }
-        
-        .progress-indicator {
-            color: #666;
-        }
-        
-        .status-indicator {
-            animation: pulse 2s infinite;
-        }
-        
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        
-        /* Responsive design */
+        /* Mobile responsive */
         @media (max-width: 768px) {
             .survey-container {
                 margin: 10px;
@@ -1352,6 +1399,14 @@ class EmailSurveyPlugin {
             
             .survey-header-image {
                 height: 180px;
+            }
+            
+            .survey-footer-image {
+                height: 80px;
+            }
+            
+            .footer-text {
+                font-size: 14px;
             }
             
             .header-content h1 {
@@ -1363,6 +1418,10 @@ class EmailSurveyPlugin {
             }
             
             .survey-content {
+                padding: 20px;
+            }
+            
+            .results-content {
                 padding: 20px;
             }
             
@@ -1400,11 +1459,28 @@ class EmailSurveyPlugin {
                 padding: 15px 40px;
                 font-size: 18px;
             }
+            
+            /* También agregar estilos para results-footer-image */
+            .results-footer-image {
+                height: 80px;
+            }
         }
         
         @media (max-width: 480px) {
             .survey-header-image {
                 height: 160px;
+            }
+            
+            .survey-footer-image {
+                height: 60px;
+            }
+            
+            .results-footer-image {
+                height: 60px;
+            }
+            
+            .footer-text {
+                font-size: 12px;
             }
             
             .header-content h1 {
@@ -1417,6 +1493,14 @@ class EmailSurveyPlugin {
             
             .chart-bar {
                 height: 25px;
+            }
+            
+            .results-content h2 {
+                font-size: 20px;
+            }
+            
+            .result-message h3 {
+                font-size: 20px;
             }
         }
         </style>
@@ -1459,9 +1543,17 @@ class EmailSurveyPlugin {
                     }
                     
                     const submitBtn = form.querySelector('.survey-submit-btn');
-                    const originalText = submitBtn.innerHTML;
+                    const originalHTML = submitBtn.innerHTML;
                     submitBtn.disabled = true;
-                    submitBtn.innerHTML = '⏳ Enviando...';
+                    submitBtn.innerHTML = `
+                        <svg class="submit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="m12 1 0 6m0 6 0 6"></path>
+                            <path d="m12 1 0 6m0 6 0 6" transform="rotate(60 12 12)"></path>
+                            <path d="m12 1 0 6m0 6 0 6" transform="rotate(120 12 12)"></path>
+                        </svg>
+                        Enviando...
+                    `;
                     
                     const formData = new FormData();
                     formData.append('action', 'submit_vote');
@@ -1487,7 +1579,12 @@ class EmailSurveyPlugin {
                                                   '<?php echo isset($_GET['survey']) ? sanitize_text_field($_GET['survey']) : ''; ?>';
                                 
                                 // Animación de éxito antes de redirigir
-                                submitBtn.innerHTML = '✅ ¡Enviado!';
+                                submitBtn.innerHTML = `
+                                    <svg class="submit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20,6 9,17 4,12"></polyline>
+                                    </svg>
+                                    ¡Enviado!
+                                `;
                                 submitBtn.style.background = '#28a745';
                                 
                                 setTimeout(() => {
@@ -1496,21 +1593,21 @@ class EmailSurveyPlugin {
                             } else {
                                 alert('Error: ' + (data.data || 'Error desconocido'));
                                 submitBtn.disabled = false;
-                                submitBtn.innerHTML = originalText;
+                                submitBtn.innerHTML = originalHTML;
                             }
                         } catch (e) {
                             console.error('Parse error:', e);
                             console.error('Raw text:', text);
                             alert('Error: Respuesta inválida del servidor');
                             submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalText;
+                            submitBtn.innerHTML = originalHTML;
                         }
                     })
                     .catch(error => {
                         console.error('Fetch error:', error);
                         alert('Error de conexión: ' + error.message);
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalText;
+                        submitBtn.innerHTML = originalHTML;
                     });
                 });
             }
@@ -1807,7 +1904,7 @@ class EmailSurveyPlugin {
             <div class="results-content">
                 <!-- NUEVO: Estadísticas compactas siempre en la parte superior -->
                 <div class="compact-stats">
-                    <h3>📊 Estadísticas en Tiempo Real</h3>
+                    <h3>👥 ¿Cómo está votando el resto?</h3>
                     <div class="horizontal-chart">
                         <div class="chart-bar">
                             <div class="bar-segment option1" style="width: <?php echo $option1_percent; ?>%" title="<?php echo esc_attr($survey->option1); ?>: <?php echo $option1_percent; ?>%"></div>
@@ -1830,7 +1927,7 @@ class EmailSurveyPlugin {
                                 <span class="label-text"><?php echo esc_html($survey->option3); ?></span>
                                 <span class="label-percent"><?php echo $option3_percent; ?>%</span>
                             </div>
-                                               </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1881,6 +1978,11 @@ class EmailSurveyPlugin {
                     Estado: <?php echo $has_completed ? 'Completado ✅' : 'En progreso ⏳'; ?><br>
                 </div>
             </div>
+            
+            <!-- NUEVO: Footer con imagen para resultados -->
+            <div class="results-footer-image">
+                <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/images/bottom.png'; ?>" alt="TEVA Survey Footer" />
+            </div>
         </div>
         
         <style>
@@ -1907,33 +2009,48 @@ class EmailSurveyPlugin {
             height: 100%;
             object-fit: cover;
             object-position: center;
-            filter: brightness(0.9);
         }
         
-        .header-overlay {
+        /* NUEVO: Footer para resultados */
+        .results-footer-image {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        
+        .results-footer-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        .footer-overlay {
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            padding: 40px 30px 30px;
+            bottom: 0;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
         
-        .header-content h1 {
+        .footer-content {
+            text-align: center;
+        }
+        
+        .footer-text {
             color: white;
             margin: 0;
-            font-size: 36px;
-            font-weight: 700;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
-            letter-spacing: -0.5px;
-        }
-        
-        .welcome-text {
-            color: #f8f9fa;
-            margin: 8px 0 0 0;
-            font-size: 18px;
-            font-weight: 300;
-            text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+            font-size: 16px;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            opacity: 0.9;
         }
         
         .results-content {
@@ -1941,7 +2058,7 @@ class EmailSurveyPlugin {
         }
         
         .results-content h2 {
-            color: #2c3e50;
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
             margin-bottom: 20px;
             font-size: 28px;
             font-weight: 600;
@@ -1949,15 +2066,10 @@ class EmailSurveyPlugin {
         }
         
         .question {
-            color: #2c3e50;
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
             margin-bottom: 25px;
             font-size: 20px;
-            font-weight: 600;
-            padding: 20px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 12px;
-            border-left: 5px solid #007cba;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-weight: 600; /* ANTES: con negrita */
         }
         
         .result-message {
@@ -2032,7 +2144,7 @@ class EmailSurveyPlugin {
         }
         
         .compact-stats h3 {
-            color: #2c3e50;
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
             margin: 0 0 20px 0;
             font-size: 20px;
             text-align: center;
@@ -2061,15 +2173,15 @@ class EmailSurveyPlugin {
         }
         
         .bar-segment.option1 {
-            background: linear-gradient(90deg, #3498db, #2980b9);
+            background: linear-gradient(90deg, #074574, #053350);
         }
         
         .bar-segment.option2 {
-            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            background: linear-gradient(90deg, #ff7900, #cc6100);
         }
         
         .bar-segment.option3 {
-            background: linear-gradient(90deg, #f39c12, #d68910);
+            background: linear-gradient(90deg, #a2c551, #8ba544);
         }
         
         .chart-labels {
@@ -2077,7 +2189,7 @@ class EmailSurveyPlugin {
             grid-template-columns: 1fr 1fr 1fr;
             gap: 15px;
         }
-        
+
         .label-item {
             display: flex;
             align-items: center;
@@ -2090,40 +2202,180 @@ class EmailSurveyPlugin {
             min-height: 45px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        
+
         .label-color {
             width: 14px;
             height: 14px;
             border-radius: 50%;
             flex-shrink: 0;
         }
-        
+
         .label-color.option1-color {
-            background: #3498db;
+            background: #074574;
         }
         
         .label-color.option2-color {
-            background: #e74c3c;
+            background: #ff7900;
         }
         
         .label-color.option3-color {
-            background: #f39c12;
+            background: #a2c551;
         }
-        
+
         .label-text {
             flex: 1;
             font-weight: 500;
             color: #495057;
             line-height: 1.3;
         }
-        
+
         .label-percent {
             font-weight: bold;
-            color: #2c3e50;
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
             font-size: 12px;
         }
+
+        .attempt-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .survey-options {
+            margin: 30px 0;
+        }
+
+        .survey-option {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin: 20px 0;
+            border: 3px solid #e9ecef;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .survey-option:hover {
+            border-color: #007cba;
+            box-shadow: 0 8px 25px rgba(0,124,186,0.15);
+            transform: translateY(-2px);
+        }
+
+        .survey-option.selected {
+            border-color: #007cba;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            box-shadow: 0 8px 25px rgba(0,124,186,0.2);
+        }
+
+        .survey-option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: #007cba;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 18px;
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
+            font-weight: 500;
+        }
+
+        .option-number {
+            background: #007cba;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .survey-submit-btn {
+            background: linear-gradient(135deg, #007cba 0%, #005a87 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 20px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 25px rgba(0,124,186,0.3);
+        }
+
+        .survey-submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,124,186,0.4);
+        }
+
+        .survey-submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .submit-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .survey-submit-btn:hover .submit-icon {
+            transform: rotate(15deg);
+        }
+
+        .session-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 14px;
+            border-left: 4px solid #28a745;
+        }
+
+        .session-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #015079; /* Cambiar de #155724 a #015079 */
+            font-weight: 500;
+        }
         
-        /* Animaciones */
+        /* También en la sección de resultados */
+        .results-content h2 {
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .question {
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 600; /* ANTES: con negrita */
+        }
+        
+        /* Animación de entrada para el gráfico */
         .bar-segment {
             animation: growBar 1.5s ease-out;
         }
@@ -2139,13 +2391,21 @@ class EmailSurveyPlugin {
         
         /* Mobile responsive */
         @media (max-width: 768px) {
-            .results-container {
+            .survey-container {
                 margin: 10px;
                 border-radius: 12px;
             }
             
-            .results-header-image {
+            .survey-header-image {
                 height: 180px;
+            }
+            
+            .survey-footer-image {
+                height: 80px;
+            }
+            
+            .footer-text {
+                font-size: 14px;
             }
             
             .header-content h1 {
@@ -2156,29 +2416,12 @@ class EmailSurveyPlugin {
                 font-size: 16px;
             }
             
+            .survey-content {
+                padding: 20px;
+            }
+            
             .results-content {
                 padding: 20px;
-            }
-            
-            .results-content h2 {
-                font-size: 24px;
-            }
-            
-            .question {
-                font-size: 18px;
-                padding: 15px;
-            }
-            
-            .result-message {
-                padding: 20px;
-            }
-            
-            .result-message h3 {
-                font-size: 24px;
-            }
-            
-            .result-message p {
-                font-size: 15px;
             }
             
             .compact-stats {
@@ -2196,15 +2439,47 @@ class EmailSurveyPlugin {
                 min-height: 40px;
             }
             
-            .retry-btn {
-                padding: 15px 30px;
+            .survey-option {
+                padding: 18px;
+                margin: 15px 0;
+            }
+            
+            .option-text {
                 font-size: 16px;
+            }
+            
+            .session-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .survey-submit-btn {
+                padding: 15px 40px;
+                font-size: 18px;
+            }
+            
+            /* También agregar estilos para results-footer-image */
+            .results-footer-image {
+                height: 80px;
             }
         }
         
         @media (max-width: 480px) {
-            .results-header-image {
+            .survey-header-image {
                 height: 160px;
+            }
+            
+            .survey-footer-image {
+                height: 60px;
+            }
+            
+            .results-footer-image {
+                height: 60px;
+            }
+            
+            .footer-text {
+                font-size: 12px;
             }
             
             .header-content h1 {
@@ -2600,6 +2875,7 @@ class EmailSurveyPlugin {
         
         // SIEMPRE registrar el voto (correcto o incorrecto)
         $result = $wpdb->insert(
+
             $table_votes,
             array(
                 'survey_id' => $survey_id,
