@@ -1018,10 +1018,13 @@ class EmailSurveyPlugin {
                 </div>
             </div>
             
-            <!-- NUEVO: Footer con imagen -->
-            <div class="survey-footer-image">
-                <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/images/bottom.png'; ?>" alt="TEVA Survey Footer" />
+        <!-- NUEVO: Footer con imagen para resultados -->
+            <div class="results-footer-image">
+                <a href="https://www.fitomedicamentos.cl/" target="_blank" rel="noopener noreferrer">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/images/bottom.png'; ?>" alt="TEVA Survey Footer" />
+                </a>
             </div>
+
         </div>
         
         <style>
@@ -1783,7 +1786,9 @@ class EmailSurveyPlugin {
             
             <!-- NUEVO: Footer con imagen para resultados -->
             <div class="results-footer-image">
-                <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/images/bottom.png'; ?>" alt="TEVA Survey Footer" />
+                <a href="https://www.fitomedicamentos.cl/" target="_blank" rel="noopener noreferrer">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/images/bottom.png'; ?>" alt="TEVA Survey Footer" />
+                </a>
             </div>
         </div>
         
