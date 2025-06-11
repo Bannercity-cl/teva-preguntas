@@ -1659,208 +1659,10 @@ class EmailSurveyPlugin {
         // Si respondió correctamente, agregar el formulario al final con separación
         if ($is_correct) {
             // Quitar el separador visual duplicado
-            $results_output .= $this->display_medical_form($email, $nombre); // AGREGAR: Pasar nombre
+            $results_output .= $this->display_confetti_celebration($email, $nombre);
         }
         
         return $results_output;
-    }
-
-    // Nueva función para mostrar el formulario médico
-    private function display_medical_form($email, $nombre) {
-        ob_start();
-        ?>
-        <div class="medical-form-wrapper">
-            <!-- Estilos CSS simplificados -->
-            <style>
-                .medical-form-wrapper {
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    margin: 20px 0;
-                }
-
-                .medical-form-wrapper .container {
-                    max-width: 600px;
-                    margin: 0 auto;
-                    background: white;
-                    border-radius: 20px;
-                    box-shadow: 0 20px 40px rgba(255, 122, 0, 0.3);
-                    overflow: hidden;
-                    animation: slideUp 0.8s ease-out;
-                    position: relative;
-                }
-
-                @keyframes slideUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-
-                /* Canvas para confetti */
-                .confetti-canvas {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    pointer-events: none;
-                    z-index: 10;
-                }
-
-                @media (max-width: 768px) {
-                    .medical-form-wrapper .container {
-                        margin: 10px;
-                        border-radius: 15px;
-                    }
-                }
-            </style>
-
-            <div class="container">
-                <!-- Canvas para el efecto confetti -->
-                <canvas class="confetti-canvas" id="confetti-canvas"></canvas>
-                
-                <!-- FORMULARIO COMENTADO - MANTENER TODO EL CÓDIGO ORIGINAL -->
-                <!--
-                <div id="fide-content-code-embed">
-                    <form id="fide-embed-form" 
-                          action="https://publiccl1.fidelizador.com/labchile/form/4D985F23A03E1BA4BDDEA1821647C7905B731D3A6420/subscription/save" 
-                          method="POST"
-                          data-fetch-geographic-zones-url="https://publiccl1.fidelizador.com/labchile/api/geo/zone/_country_id_"
-                          data-fetch-countries-url="https://publiccl1.fidelizador.com/labchile/api/geo/countries"
-                          accept-charset="UTF-8">
-                        
-                        Aquí está todo el formulario médico comentado completo
-                        que se puede descomentar fácilmente más adelante
-                        
-                    </form>
-                </div>
-                -->
-            </div>
-        </div>
-
-        <!-- Script para efectos de confetti -->
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            createConfettiEffect();
-        });
-
-        function createConfettiEffect() {
-            const canvas = document.getElementById('confetti-canvas');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            // Ajustar tamaño del canvas
-            function resizeCanvas() {
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
-            }
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            
-            // Partículas de confetti
-            const confetti = [];
-            const colors = ['#FF7A00', '#FFB347', '#FFA500', '#28a745', '#20c997', '#007cba', '#dc3545', '#ffc107'];
-            
-            // Crear partícula de confetti
-            function createConfettiPiece() {
-                return {
-                    x: Math.random() * canvas.width,
-                    y: -10,
-                    width: Math.random() * 8 + 4,
-                    height: Math.random() * 8 + 4,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    speed: Math.random() * 3 + 2,
-                    rotation: Math.random() * 360,
-                    rotationSpeed: Math.random() * 6 - 3,
-                    gravity: 0.1,
-                    wind: Math.random() * 2 - 1
-                };
-            }
-            
-            // Inicializar confetti
-            function initConfetti() {
-                for (let i = 0; i < 50; i++) {
-                    confetti.push(createConfettiPiece());
-                }
-            }
-            
-            // Actualizar confetti
-            function updateConfetti() {
-                for (let i = confetti.length - 1; i >= 0; i--) {
-                    const piece = confetti[i];
-                    
-                    piece.y += piece.speed;
-                    piece.x += piece.wind;
-                    piece.speed += piece.gravity;
-                    piece.rotation += piece.rotationSpeed;
-                    
-                    // Remover si sale de la pantalla
-                    if (piece.y > canvas.height + 10) {
-                        confetti.splice(i, 1);
-                    }
-                }
-                
-                // Agregar nuevas partículas ocasionalmente
-                if (Math.random() < 0.1 && confetti.length < 30) {
-                    confetti.push(createConfettiPiece());
-                }
-            }
-            
-            // Dibujar confetti
-            function drawConfetti() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                confetti.forEach(piece => {
-                    ctx.save();
-                    ctx.translate(piece.x + piece.width / 2, piece.y + piece.height / 2);
-                    ctx.rotate((piece.rotation * Math.PI) / 180);
-                    
-                    // Dibujar rectángulo de confetti
-                    ctx.fillStyle = piece.color;
-                    ctx.fillRect(-piece.width / 2, -piece.height / 2, piece.width, piece.height);
-                    
-                    // Agregar brillo
-                    ctx.shadowColor = piece.color;
-                    ctx.shadowBlur = 5;
-                    ctx.fillRect(-piece.width / 2, -piece.height / 2, piece.width, piece.height);
-                    
-                    ctx.restore();
-                });
-            }
-            
-            // Loop de animación
-            function animate() {
-                updateConfetti();
-                drawConfetti();
-                requestAnimationFrame(animate);
-            }
-            
-            // Iniciar efecto
-            initConfetti();
-            animate();
-            
-            // Crear ráfaga inicial más intensa
-            setTimeout(() => {
-                for (let i = 0; i < 30; i++) {
-                    confetti.push(createConfettiPiece());
-                }
-            }, 500);
-            
-            // Segunda ráfaga
-            setTimeout(() => {
-                for (let i = 0; i < 20; i++) {
-                    confetti.push(createConfettiPiece());
-                }
-            }, 1500);
-        }
-        </script>
-        
-        <?php
-        return ob_get_clean();
     }
 
     // Función para mostrar resultados normales
@@ -2537,6 +2339,112 @@ class EmailSurveyPlugin {
         return ob_get_clean();
     }
 
+    // Nueva función para mostrar confetti
+    private function display_confetti_celebration($email, $nombre) {
+        ob_start();
+        ?>
+        <canvas id="confetti-canvas"></canvas>
+        
+        <style>
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        </style>
+        
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎉 Iniciando confetti');
+            
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const confetti = [];
+            const colors = ['#FF7A00', '#FFB347', '#FFA500', '#28a745', '#20c997', '#007cba', '#dc3545', '#ffc107'];
+
+            function createConfettiPiece() {
+                return {
+                    x: Math.random() * canvas.width,
+                    y: -10,
+                    width: Math.random() * 8 + 4,
+                    height: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speed: Math.random() * 3 + 2,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 6 - 3,
+                    gravity: 0.1,
+                    wind: Math.random() * 2 - 1
+                };
+            }
+
+            function initConfetti() {
+                for (let i = 0; i < 60; i++) {
+                    confetti.push(createConfettiPiece());
+                }
+            }
+
+            function updateConfetti() {
+                for (let i = confetti.length - 1; i >= 0; i--) {
+                    const piece = confetti[i];
+                    piece.y += piece.speed;
+                    piece.x += piece.wind;
+                    piece.speed += piece.gravity;
+                    piece.rotation += piece.rotationSpeed;
+                    
+                    if (piece.y > canvas.height + 10) {
+                        confetti.splice(i, 1);
+                    }
+                }
+            }
+
+            function drawConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                confetti.forEach(piece => {
+                    ctx.save();
+                    ctx.translate(piece.x + piece.width / 2, piece.y + piece.height / 2);
+                    ctx.rotate((piece.rotation * Math.PI) / 180);
+                    ctx.fillStyle = piece.color;
+                    ctx.fillRect(-piece.width / 2, -piece.height / 2, piece.width, piece.height);
+                    ctx.restore();
+                });
+            }
+
+            function animate() {
+                updateConfetti();
+                drawConfetti();
+                requestAnimationFrame(animate);
+            }
+
+            initConfetti();
+            animate();
+
+            setTimeout(() => {
+                for (let i = 0; i < 40; i++) {
+                    confetti.push(createConfettiPiece());
+                }
+            }, 800);
+
+            setTimeout(() => {
+                canvas.style.display = 'none';
+            }, 8000);
+        });
+        </script>
+        
+        <?php
+        return ob_get_clean();
+    }
     // NUEVAS FUNCIONES PARA MANEJO DE SESIONES SEGURAS
     private function create_session_token($survey_id, $email, $nombre = '') {
         $data = array(
