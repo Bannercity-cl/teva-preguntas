@@ -1085,7 +1085,7 @@ class EmailSurveyPlugin {
         .survey-footer-image {
             position: relative;
             width: 100%;
-            height: 120px;
+            height: auto; /*antes era 120px */
             overflow: hidden;
             margin-top: 0;
         }
@@ -1093,7 +1093,7 @@ class EmailSurveyPlugin {
         .survey-footer-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center;
         }
         
@@ -1817,7 +1817,7 @@ class EmailSurveyPlugin {
         .results-footer-image {
             position: relative;
             width: 100%;
-            height: 120px;
+            height: auto; /* antes era 120px */
             overflow: hidden;
             margin-top: 0;
         }
@@ -1825,7 +1825,7 @@ class EmailSurveyPlugin {
         .results-footer-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center;
         }
         
