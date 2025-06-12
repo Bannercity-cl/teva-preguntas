@@ -995,14 +995,17 @@ class EmailSurveyPlugin {
                         </label>
                     </div>
                     
-                    <div class="submit-section">
-                        <button type="submit" class="survey-submit-btn">
-                            <svg class="submit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="22" y1="2" x2="11" y2="13"></line>
-                                <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                    <!-- Mensaje de estado oculto inicialmente -->
+                    <div id="vote-status" class="vote-status" style="display: none;">
+                        <div class="status-content">
+                            <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="m12 1 0 6m0 6 0 6"></path>
+                                <path d="m12 1 0 6m0 6 0 6" transform="rotate(60 12 12)"></path>
+                                <path d="m12 1 0 6m0 6 0 6" transform="rotate(120 12 12)"></path>
                             </svg>
-                            Enviar Respuesta
-                        </button>
+                            <span class="status-text">Enviando respuesta...</span>
+                        </div>
                     </div>
                 </form>
                 
@@ -1038,6 +1041,9 @@ class EmailSurveyPlugin {
             overflow: hidden;
         }
         
+        .survey-content {
+            padding: 30px;
+        }
         /* NUEVO: Estilos para el header con imagen */
         .survey-header-image {
             position: relative;
@@ -1126,27 +1132,96 @@ class EmailSurveyPlugin {
             opacity: 0.9;
         }
         
-        .survey-content {
+        .results-content {
             padding: 30px;
         }
         
-        .question-section {
-            margin-bottom: 30px;
-        }
-        
-        .question-section h2 {
+        .results-content h2 {
             color: #015079; /* Cambiar de #2c3e50 a #015079 */
             margin-bottom: 20px;
-            font-size: 24px;
-            line-height: 1.4;
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
         }
-
+        
+        .question {
+            color: #015079; /* Cambiar de #2c3e50 a #015079 */
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 600; /* ANTES: con negrita */
+        }
+        
+        .result-message {
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .result-message.correct {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 3px solid #28a745;
+            color: #155724;
+        }
+        
+        .result-message.incorrect {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border: 3px solid #dc3545;
+            color: #721c24;
+        }
+        
+        .result-message h3 {
+            margin: 0 0 15px 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .result-message p {
+            margin: 10px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .result-message em {
+            font-style: italic;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .retry-section {
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .retry-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #007cba 0%, #005a87 100%);
+            color: white;
+            padding: 18px 35px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 18px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,124,186,0.3);
+        }
+        
+        .retry-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,124,186,0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Estilos para estadísticas compactas */
         .compact-stats {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             padding: 25px 30px;
             border-bottom: 1px solid #dee2e6;
         }
-
+        
         .compact-stats h3 {
             color: #015079; /* Cambiar de #2c3e50 a #015079 */
             margin: 0 0 20px 0;
@@ -1154,11 +1229,11 @@ class EmailSurveyPlugin {
             text-align: center;
             font-weight: 600;
         }
-
+        
         .horizontal-chart {
             width: 100%;
         }
-
+        
         .chart-bar {
             width: 100%;
             height: 30px;
@@ -1169,13 +1244,13 @@ class EmailSurveyPlugin {
             margin-bottom: 20px;
             box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
         }
-
+        
         .bar-segment {
             height: 100%;
             transition: all 0.8s ease;
             position: relative;
         }
-
+        
         .bar-segment.option1 {
             background: linear-gradient(90deg, #074574, #053350);
         }
@@ -1351,6 +1426,7 @@ class EmailSurveyPlugin {
             justify-content: space-between;
             align-items: center;
             margin-top: 20px;
+            margin-bottom: 30px;
             font-size: 14px;
             border-left: 4px solid #28a745;
         }
@@ -1359,13 +1435,13 @@ class EmailSurveyPlugin {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #015079; /* Cambiar de #155724 a #015079 */
+            color: #015079; 
             font-weight: 500;
         }
         
         /* También en la sección de resultados */
         .results-content h2 {
-            color: #015079; /* Cambiar de #2c3e50 a #015079 */
+            color: #015079; 
             margin-bottom: 20px;
             font-size: 28px;
             font-weight: 600;
@@ -1373,12 +1449,21 @@ class EmailSurveyPlugin {
         }
 
         .question {
-            color: #015079; /* Cambiar de #2c3e50 a #015079 */
+            color: #015079; 
             margin-bottom: 25px;
             font-size: 20px;
             font-weight: 600; /* ANTES: con negrita */
         }
         
+        .question-section h2 {
+        color: #015079;
+        margin-bottom: 25px;
+        font-size: 20px;
+        font-weight: 600;
+        padding: 20px 0 0 0;
+
+        }
+
         /* Animación de entrada para el gráfico */
         .bar-segment {
             animation: growBar 1.5s ease-out;
@@ -1506,20 +1591,257 @@ class EmailSurveyPlugin {
                 font-size: 20px;
             }
         }
+        /* Nuevo: Estilos para el estado de envío */
+        .vote-status {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #007cba;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .status-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #015079;
+        }
+        
+        .status-icon {
+            animation: spin 1s linear infinite;
+        }
+        
+        .vote-status.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #28a745;
+        }
+        
+        .vote-status.success .status-content {
+            color: #155724;
+        }
+        
+        .vote-status.success .status-icon {
+            animation: none;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Deshabilitar opciones durante el envío */
+        .survey-options.disabled .survey-option {
+            opacity: 0.6;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        
+        .survey-options.disabled .survey-option.selected {
+            opacity: 0.8;
+            border-color: #007cba;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
         </style>
         
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('vote-form');
             const options = document.querySelectorAll('.survey-option');
+            const voteStatus = document.getElementById('vote-status');
+            const surveyOptions = document.querySelector('.survey-options');
             
-            options.forEach(option => {
-                option.addEventListener('click', function() {
-                    options.forEach(opt => opt.classList.remove('selected'));
-                    this.classList.add('selected');
-                    this.querySelector('input').checked = true;
+            // NUEVO: Detectar si es primera visita y hay opción preseleccionada
+            const preselectedOption = <?php echo $preselected_option; ?>;
+            const attemptCount = <?php echo $attempts; ?>;
+            const isFirstVisit = (attemptCount === 0 && preselectedOption > 0);
+            
+            console.log('Survey loaded - Attempts:', attemptCount, 'Preselected:', preselectedOption, 'First visit:', isFirstVisit);
+            
+            // AUTO-VOTE solo en primera visita
+            if (isFirstVisit) {
+                console.log('🎯 Auto-vote activado para primera visita');
+                
+                // Auto-vote casi instantáneo (solo 800ms para mostrar la selección)
+                setTimeout(() => {
+                    console.log('⏰ Ejecutando auto-vote');
+                    submitVote(preselectedOption, true); // true = es auto-vote
+                }, 800);
+                
+                // Permitir cancelar el auto-vote haciendo clic en otra opción
+                options.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        if (isFirstVisit && !surveyOptions.classList.contains('disabled')) {
+                            e.preventDefault();
+                            console.log('🛑 Auto-vote cancelado por usuario - activando votación manual');
+                            
+                            // Cancelar el auto-vote y activar votación manual
+                            clearTimeout(autoVoteTimeout);
+                            setupManualVoting();
+                        }
+                    });
                 });
-            });
+            } else {
+                // Votación manual normal desde el inicio
+                setupManualVoting();
+            }
+            
+            function setupManualVoting() {
+                options.forEach(option => {
+                    // Remover listeners anteriores
+                    option.replaceWith(option.cloneNode(true));
+                });
+                
+                // Re-obtener elementos después del clonado
+                const newOptions = document.querySelectorAll('.survey-option');
+                
+                newOptions.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        // Si ya está enviando, no hacer nada
+                        if (surveyOptions.classList.contains('disabled')) {
+                            e.preventDefault();
+                            return;
+                        }
+                        
+                        // Seleccionar la opción
+                        newOptions.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        this.querySelector('input').checked = true;
+                        
+                        // Enviar inmediatamente
+                        setTimeout(() => {
+                            submitVote(this.querySelector('input').value, false); // false = voto manual
+                        }, 200);
+                    });
+                });
+            }
+            
+            function submitVote(selectedOption, isAutoVote = false) {
+                console.log('Enviando voto para opción:', selectedOption, 'Auto-vote:', isAutoVote);
+                
+                // Deshabilitar opciones y mostrar estado
+                surveyOptions.classList.add('disabled');
+                voteStatus.style.display = 'block';
+                voteStatus.classList.remove('success');
+                
+                // Mensaje diferente para auto-vote
+                const statusMessage = isAutoVote ? 'Procesando selección automática...' : 'Enviando respuesta...';
+                
+                // Actualizar icono y texto
+                voteStatus.innerHTML = `
+                    <div class="status-content">
+                        <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="m12 1 0 6m0 6 0 6"></path>
+                            <path d="m12 1 0 6m0 6 0 6" transform="rotate(60 12 12)"></path>
+                            <path d="m12 1 0 6m0 6 0 6" transform="rotate(120 12 12)"></path>
+                        </svg>
+                        <span class="status-text">${statusMessage}</span>
+                    </div>
+                `;
+                
+                const formData = new FormData();
+                formData.append('action', 'submit_vote');
+                formData.append('survey_id', form.dataset.survey);
+                formData.append('email', form.dataset.email);
+                formData.append('option', selectedOption);
+                formData.append('nonce', form.dataset.nonce);
+                
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                .then(response => response.text())
+                .then(text => {
+                    console.log('Raw response:', text);
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('Parsed response:', data);
+                        
+                        if (data.success) {
+                            // Mostrar éxito
+                            voteStatus.classList.add('success');
+                            voteStatus.innerHTML = `
+                                <div class="status-content">
+                                    <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20,6 9,17 4,12"></polyline>
+                                    </svg>
+                                    <span class="status-text">¡Respuesta enviada!</span>
+                                </div>
+                            `;
+                            
+                            // Redirigir a resultados
+                            const resultsUrl = '<?php echo home_url('/resultados/?survey='); ?>' + 
+                                              '<?php echo isset($_GET['survey']) ? sanitize_text_field($_GET['survey']) : ''; ?>';
+                            
+                            setTimeout(() => {
+                                window.location.href = resultsUrl;
+                            }, 1500);
+                        } else {
+                            // Mostrar error y rehabilitar
+                            voteStatus.innerHTML = `
+                                <div class="status-content">
+                                    <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    <span class="status-text">Error: ${data.data || 'Error desconocido'}</span>
+                                </div>
+                            `;
+                            voteStatus.style.borderColor = '#dc3545';
+                            voteStatus.style.background = 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
+                            
+                            setTimeout(() => {
+                                surveyOptions.classList.remove('disabled');
+                                voteStatus.style.display = 'none';
+                                // Resetear estilos
+                                voteStatus.style.borderColor = '#007cba';
+                                voteStatus.style.background = 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)';
+                                
+                                // Reactivar votación manual
+                                setupManualVoting();
+                            }, 3000);
+                        }
+                    } catch (e) {
+                        console.error('Parse error:', e);
+                        handleVoteError('Respuesta inválida del servidor');
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    handleVoteError('Error de conexión: ' + error.message);
+                });
+            }
+            
+            function handleVoteError(errorMessage) {
+                voteStatus.innerHTML = `
+                    <div class="status-content">
+                        <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        <span class="status-text">${errorMessage}</span>
+                    </div>
+                `;
+                voteStatus.style.borderColor = '#dc3545';
+                voteStatus.style.background = 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
+                
+                setTimeout(() => {
+                    surveyOptions.classList.remove('disabled');
+                    voteStatus.style.display = 'none';
+                    // Resetear estilos
+                    voteStatus.style.borderColor = '#007cba';
+                    voteStatus.style.background = 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)';
+                    
+                    // Reactivar votación manual
+                    setupManualVoting();
+                }, 3000);
+            }
             
             // Efecto hover para las barras del gráfico
             const barSegments = document.querySelectorAll('.bar-segment');
@@ -1533,87 +1855,6 @@ class EmailSurveyPlugin {
                     this.style.transform = 'scaleY(1)';
                 });
             });
-            
-            // AGREGAR: Event listener para el submit del formulario
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const selectedOption = form.querySelector('input[name="option"]:checked');
-                    if (!selectedOption) {
-                        alert('Por favor selecciona una opción');
-                        return;
-                    }
-                    
-                    const submitBtn = form.querySelector('.survey-submit-btn');
-                    const originalHTML = submitBtn.innerHTML;
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = `
-                        <svg class="submit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="m12 1 0 6m0 6 0 6"></path>
-                            <path d="m12 1 0 6m0 6 0 6" transform="rotate(60 12 12)"></path>
-                            <path d="m12 1 0 6m0 6 0 6" transform="rotate(120 12 12)"></path>
-                        </svg>
-                        Enviando...
-                    `;
-                    
-                    const formData = new FormData();
-                    formData.append('action', 'submit_vote');
-                    formData.append('survey_id', form.dataset.survey);
-                    formData.append('email', form.dataset.email);
-                    formData.append('option', selectedOption.value);
-                    formData.append('nonce', form.dataset.nonce);
-                    
-                    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-                        method: 'POST',
-                        body: formData,
-                        credentials: 'same-origin'
-                    })
-                    .then(response => response.text())
-                    .then(text => {
-                        console.log('Raw response:', text);
-                        try {
-                            const data = JSON.parse(text);
-                            console.log('Parsed response:', data);
-                            
-                            if (data.success) {
-                                const resultsUrl = '<?php echo home_url('/resultados/?survey='); ?>' + 
-                                                  '<?php echo isset($_GET['survey']) ? sanitize_text_field($_GET['survey']) : ''; ?>';
-                                
-                                // Animación de éxito antes de redirigir
-                                submitBtn.innerHTML = `
-                                    <svg class="submit-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="20,6 9,17 4,12"></polyline>
-                                    </svg>
-                                    ¡Enviado!
-                                `;
-                                submitBtn.style.background = '#28a745';
-                                
-                                setTimeout(() => {
-                                    window.location.href = resultsUrl;
-                                }, 1000);
-                            } else {
-                                alert('Error: ' + (data.data || 'Error desconocido'));
-                                submitBtn.disabled = false;
-                                submitBtn.innerHTML = originalHTML;
-                            }
-                        } catch (e) {
-                            console.error('Parse error:', e);
-                            console.error('Raw text:', text);
-                            alert('Error: Respuesta inválida del servidor');
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalHTML;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Fetch error:', error);
-                        alert('Error de conexión: ' + error.message);
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalHTML;
-                    });
-                });
-            }
         });
         </script>
         <?php
@@ -1883,7 +2124,7 @@ class EmailSurveyPlugin {
             padding: 30px;
             border-radius: 15px;
             margin: 30px 0;
-            animation: slideIn 0.6s ease-out;
+            animation: slideIn 0.3s ease-out;
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
         
@@ -2309,10 +2550,258 @@ class EmailSurveyPlugin {
                 font-size: 20px;
             }
         }
+        /* Nuevo: Estilos para el estado de envío */
+        .vote-status {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #007cba;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .status-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #015079;
+        }
+        
+        .status-icon {
+            animation: spin 1s linear infinite;
+        }
+        
+        .vote-status.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #28a745;
+        }
+        
+        .vote-status.success .status-content {
+            color: #155724;
+        }
+        
+        .vote-status.success .status-icon {
+            animation: none;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Deshabilitar opciones durante el envío */
+        .survey-options.disabled .survey-option {
+            opacity: 0.6;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        
+        .survey-options.disabled .survey-option.selected {
+            opacity: 0.8;
+            border-color: #007cba;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
         </style>
         
         <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('vote-form');
+            const options = document.querySelectorAll('.survey-option');
+            const voteStatus = document.getElementById('vote-status');
+            const surveyOptions = document.querySelector('.survey-options');
+            
+            // NUEVO: Detectar si es primera visita y hay opción preseleccionada
+            const preselectedOption = <?php echo $preselected_option; ?>;
+            const attemptCount = <?php echo $attempts; ?>;
+            const isFirstVisit = (attemptCount === 0 && preselectedOption > 0);
+            
+            console.log('Survey loaded - Attempts:', attemptCount, 'Preselected:', preselectedOption, 'First visit:', isFirstVisit);
+            
+            // AUTO-VOTE solo en primera visita
+            if (isFirstVisit) {
+                console.log('🎯 Auto-vote activado para primera visita');
+                
+                // Auto-vote casi instantáneo (solo 800ms para mostrar la selección)
+                setTimeout(() => {
+                    console.log('⏰ Ejecutando auto-vote');
+                    submitVote(preselectedOption, true); // true = es auto-vote
+                }, 800);
+                
+                // Permitir cancelar el auto-vote haciendo clic en otra opción
+                options.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        if (isFirstVisit && !surveyOptions.classList.contains('disabled')) {
+                            e.preventDefault();
+                            console.log('🛑 Auto-vote cancelado por usuario - activando votación manual');
+                            
+                            // Cancelar el auto-vote y activar votación manual
+                            clearTimeout(autoVoteTimeout);
+                            setupManualVoting();
+                        }
+                    });
+                });
+            } else {
+                // Votación manual normal desde el inicio
+                setupManualVoting();
+            }
+            
+            function setupManualVoting() {
+                options.forEach(option => {
+                    // Remover listeners anteriores
+                    option.replaceWith(option.cloneNode(true));
+                });
+                
+                // Re-obtener elementos después del clonado
+                const newOptions = document.querySelectorAll('.survey-option');
+                
+                newOptions.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        // Si ya está enviando, no hacer nada
+                        if (surveyOptions.classList.contains('disabled')) {
+                            e.preventDefault();
+                            return;
+                        }
+                        
+                        // Seleccionar la opción
+                        newOptions.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        this.querySelector('input').checked = true;
+                        
+                        // Enviar inmediatamente
+                        setTimeout(() => {
+                            submitVote(this.querySelector('input').value, false); // false = voto manual
+                        }, 200);
+                    });
+                });
+            }
+            
+            function submitVote(selectedOption, isAutoVote = false) {
+                console.log('Enviando voto para opción:', selectedOption, 'Auto-vote:', isAutoVote);
+                
+                // Deshabilitar opciones y mostrar estado
+                surveyOptions.classList.add('disabled');
+                voteStatus.style.display = 'block';
+                voteStatus.classList.remove('success');
+                
+                // Mensaje diferente para auto-vote
+                const statusMessage = isAutoVote ? 'Procesando selección automática...' : 'Enviando respuesta...';
+                
+                // Actualizar icono y texto
+                voteStatus.innerHTML = `
+                    <div class="status-content">
+                        <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="m12 1 0 6m0 6 0 6"></path>
+                            <path d="m12 1 0 6m0 6 0 6" transform="rotate(60 12 12)"></path>
+                            <path d="m12 1 0 6m0 6 0 6" transform="rotate(120 12 12)"></path>
+                        </svg>
+                        <span class="status-text">${statusMessage}</span>
+                    </div>
+                `;
+                
+                const formData = new FormData();
+                formData.append('action', 'submit_vote');
+                formData.append('survey_id', form.dataset.survey);
+                formData.append('email', form.dataset.email);
+                formData.append('option', selectedOption);
+                formData.append('nonce', form.dataset.nonce);
+                
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                .then(response => response.text())
+                .then(text => {
+                    console.log('Raw response:', text);
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('Parsed response:', data);
+                        
+                        if (data.success) {
+                            // Mostrar éxito
+                            voteStatus.classList.add('success');
+                            voteStatus.innerHTML = `
+                                <div class="status-content">
+                                    <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20,6 9,17 4,12"></polyline>
+                                    </svg>
+                                    <span class="status-text">¡Respuesta enviada!</span>
+                                </div>
+                            `;
+                            
+                            // Redirigir a resultados
+                            const resultsUrl = '<?php echo home_url('/resultados/?survey='); ?>' + 
+                                              '<?php echo isset($_GET['survey']) ? sanitize_text_field($_GET['survey']) : ''; ?>';
+                            
+                            setTimeout(() => {
+                                window.location.href = resultsUrl;
+                            }, 1500);
+                        } else {
+                            // Mostrar error y rehabilitar
+                            voteStatus.innerHTML = `
+                                <div class="status-content">
+                                    <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    <span class="status-text">Error: ${data.data || 'Error desconocido'}</span>
+                                </div>
+                            `;
+                            voteStatus.style.borderColor = '#dc3545';
+                            voteStatus.style.background = 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
+                            
+                            setTimeout(() => {
+                                surveyOptions.classList.remove('disabled');
+                                voteStatus.style.display = 'none';
+                                // Resetear estilos
+                                voteStatus.style.borderColor = '#007cba';
+                                voteStatus.style.background = 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)';
+                                
+                                // Reactivar votación manual
+                                setupManualVoting();
+                            }, 3000);
+                        }
+                    } catch (e) {
+                        console.error('Parse error:', e);
+                        handleVoteError('Respuesta inválida del servidor');
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    handleVoteError('Error de conexión: ' + error.message);
+                });
+            }
+            
+            function handleVoteError(errorMessage) {
+                voteStatus.innerHTML = `
+                    <div class="status-content">
+                        <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        <span class="status-text">${errorMessage}</span>
+                    </div>
+                `;
+                voteStatus.style.borderColor = '#dc3545';
+                voteStatus.style.background = 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
+                
+                setTimeout(() => {
+                    surveyOptions.classList.remove('disabled');
+                    voteStatus.style.display = 'none';
+                    // Resetear estilos
+                    voteStatus.style.borderColor = '#007cba';
+                    voteStatus.style.background = 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)';
+                    
+                    // Reactivar votación manual
+                    setupManualVoting();
+                }, 3000);
+            }
+            
             // Efecto hover para las barras del gráfico
             const barSegments = document.querySelectorAll('.bar-segment');
             barSegments.forEach(segment => {
@@ -2325,27 +2814,12 @@ class EmailSurveyPlugin {
                     this.style.transform = 'scaleY(1)';
                 });
             });
-            
-            // Animación de entrada para los elementos
-            const resultMessage = document.querySelector('.result-message');
-            if (resultMessage) {
-                resultMessage.style.opacity = '0';
-                resultMessage.style.transform = 'translateY(20px)';
-                
-                setTimeout(() => {
-                    resultMessage.style.transition = 'all 0.6s ease-out';
-                    resultMessage.style.opacity = '1';
-                    resultMessage.style.transform = 'translateY(0)';
-                }, 300);
-            }
         });
         </script>
         <?php
-        return ob_get_clean();
     }
-
-    // Nueva función para mostrar confetti
-    private function display_confetti_celebration($email, $nombre) {
+    
+    public function display_confetti_celebration($email, $nombre) {
         ob_start();
         ?>
         <canvas id="confetti-canvas"></canvas>
