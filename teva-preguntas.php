@@ -1027,7 +1027,7 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
                             <?php if ($attempts == 1): ?>
                                 <p>Tu primera respuesta no fue correcta. ¡Inténtalo de nuevo!</p>
                             <?php elseif ($attempts >= 2): ?>
-                                <p>Has intentado <?php echo $attempts; ?> veces. ¡Sigue intentando!</p>
+                                <p>Ha intentado <?php echo $attempts; ?> veces. ¡Sigue intentando!</p>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -1224,17 +1224,17 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
                     <div class="result-message <?php echo $is_correct ? 'correct' : 'incorrect'; ?>">
                         <?php if ($is_correct): ?>
                             <h3>¡Excelente<?php echo !empty($nombre) ? ', ' . esc_html($nombre) : ''; ?>! 🎉</h3>
-                            <p>Has seleccionado la respuesta correcta. ¡Buen trabajo!</p>
+                            <p>Ha seleccionado la respuesta correcta. ¡Buen trabajo!</p>
                             <?php if ($attempt_count == 1): ?>
-                                <p><em>¡Lo lograste en el primer intento! 🏆</em></p>
+                                <p><em>¡Lo logró en el primer intento! 🏆</em></p>
                             <?php elseif ($attempt_count == 2): ?>
-                                <p><em>¡Lo lograste en el segundo intento! 👏</em></p>
+                                <p><em>¡Lo logró en el segundo intento! 👏</em></p>
                             <?php else: ?>
                                 <p><em>¡Persistencia recompensada<?php echo !empty($nombre) ? ', ' . esc_html($nombre) : ''; ?>! Lo lograste en el intento <?php echo $attempt_count; ?>! 🎯</em></p>
                             <?php endif; ?>
                         <?php else: ?>
-                            <h3>¡Inténtalo de nuevo<?php echo !empty($nombre) ? ', ' . esc_html($nombre) : ''; ?>! 🤔</h3>
-                            <p>Tu respuesta no fue la correcta esta vez.</p>
+                            <h3>¡Inténtelo de nuevo<?php echo !empty($nombre) ? ', ' . esc_html($nombre) : ''; ?>! 🤔</h3>
+                            <p>Su respuesta no fue la correcta esta vez.</p>
                             
                             <?php if (!$has_completed): ?>
                                 <div class="retry-section">
@@ -1252,7 +1252,7 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
                                     </a>
                                     
                                     <p style="margin-top: 10px; font-size: 14px; color: #666;">
-                                        💡 <strong>Consejo:</strong> ¡No te rindas! Puedes seguir intentando hasta encontrar la respuesta correcta.
+                                        💡 <strong>Consejo:</strong> ¡No se rinda! Puede seguir intentando hasta encontrar la respuesta correcta.
                                     </p>
                                 </div>
                             <?php endif; ?>
@@ -1650,7 +1650,7 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
                     return;
                 } else {
                     teva_debug_log('User already completed survey with correct answer');
-                    wp_send_json_error('Ya has completado esta pregunta exitosamente');
+                    wp_send_json_error('Ya ha completado esta pregunta exitosamente');
                     return;
                 }
             }
