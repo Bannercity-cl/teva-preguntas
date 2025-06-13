@@ -949,7 +949,7 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
             $results_url = home_url('/resultados/?survey=' . $this->create_session_token($survey_id, $email, $nombre));
             return '<div style="padding: 20px; border: 2px solid blue;">
                 <h3>✅ Encuesta Completada</h3>
-                <p>Ya has completado esta encuesta exitosamente.</p>
+                <p>Ya ha completado esta encuesta exitosamente.</p>
                 <p><a href="' . $results_url . '" class="button" style="background: #007cba; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Ver Resultados</a></p>
             </div>';
         }
