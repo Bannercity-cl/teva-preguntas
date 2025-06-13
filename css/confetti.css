@@ -1,0 +1,230 @@
+/* ===== CONFETTI ANIMATION STYLES ===== */
+
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    display: block;
+}
+
+/* Mensaje de celebración */
+.celebration-message {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+    border: 2px solid #ffc107;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    margin: 25px 0;
+    animation: celebrate 0.6s ease-out;
+    box-shadow: 0 8px 25px rgba(255, 193, 7, 0.3);
+}
+
+.celebration-message h3 {
+    color: #856404;
+    margin: 0 0 15px 0;
+    font-size: 24px;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.celebration-message p {
+    color: #856404;
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.celebration-message .emoji {
+    font-size: 2em;
+    margin: 0 5px;
+    animation: bounce 1s infinite;
+}
+
+/* Animaciones para confetti */
+@keyframes celebrate {
+    0% { 
+        transform: scale(0.9) rotate(-2deg); 
+        opacity: 0; 
+    }
+    50% { 
+        transform: scale(1.05) rotate(1deg); 
+    }
+    100% { 
+        transform: scale(1) rotate(0deg); 
+        opacity: 1; 
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Efectos especiales para cuando aparece el confetti */
+.confetti-active {
+    animation: confettiGlow 2s ease-in-out;
+}
+
+@keyframes confettiGlow {
+    0% { 
+        box-shadow: 0 0 0 rgba(255, 193, 7, 0); 
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(255, 193, 7, 0.5); 
+    }
+    100% { 
+        box-shadow: 0 0 0 rgba(255, 193, 7, 0); 
+    }
+}
+
+/* Estilos para overlay de celebración */
+.celebration-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 9998;
+    pointer-events: none;
+    animation: overlayFade 3s ease-out forwards;
+}
+
+@keyframes overlayFade {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Efectos especiales para texto */
+.confetti-text {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+    background-size: 400% 400%;
+    animation: rainbowText 3s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@keyframes rainbowText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Partículas flotantes adicionales */
+.floating-emoji {
+    position: fixed;
+    font-size: 2rem;
+    pointer-events: none;
+    z-index: 9997;
+    animation: floatUp 4s ease-out forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100vh) rotate(360deg);
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .celebration-message {
+        margin: 15px;
+        padding: 20px;
+    }
+    
+    .celebration-message h3 {
+        font-size: 20px;
+    }
+    
+    .celebration-message p {
+        font-size: 14px;
+    }
+    
+    .celebration-message .emoji {
+        font-size: 1.5em;
+    }
+    
+    .floating-emoji {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .celebration-message {
+        margin: 10px;
+        padding: 15px;
+    }
+    
+    .celebration-message h3 {
+        font-size: 18px;
+    }
+    
+    .celebration-message p {
+        font-size: 13px;
+    }
+}
+
+/* Efectos adicionales para mejor experiencia */
+.confetti-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ffc107;
+    border-radius: 50%;
+    animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Efecto de pulso para elementos importantes */
+.pulse-effect {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+    }
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+    }
+}
