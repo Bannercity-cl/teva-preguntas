@@ -2,11 +2,12 @@
 /**
  * Plugin Name: TEVA Preguntas
  * Description: Sistema de encuestas por email con validación CSV
- * Version: 1.2
+ * Version: 1.3
  * Author: Daniel Avila
  * Requires at least: 5.0
  * Tested up to: 6.4
- * Requires PHP: 8.1
+ * Requires PHP: 7.4
+ * License: MIT
  * Text Domain: teva-preguntas
  */
 
@@ -16,11 +17,13 @@ if (!defined('ABSPATH')) {
 }
 
 // Función auxiliar para debug interno (solo CLI)
-function teva_debug_log($message) {
-    // Solo log en CLI o si WP_DEBUG está activo y el usuario es admin
-    if (defined('WP_CLI') && WP_CLI || 
-        (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options'))) {
-        error_log('TEVA Plugin: ' . $message);
+if (!function_exists('teva_debug_log')) {
+    function teva_debug_log($message) {
+        // Solo log en CLI o si WP_DEBUG está activo y el usuario es admin
+        if (defined('WP_CLI') && WP_CLI || 
+            (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options'))) {
+            error_log('TEVA Plugin: ' . $message);
+        }
     }
 }
 
@@ -620,8 +623,8 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
             if ($line_number == 1 && (
                 strpos(strtolower($data[0]), 'specialty') !== false || 
                 strpos(strtolower($data[0]), 'especialidad') !== false ||
-                strpos(strtolower($data[1] ?? ''), 'email') !== false ||
-                strpos(strtolower($data[1] ?? ''), 'mail') !== false
+                strpos(strtolower(isset($data[1]) ? $data[1] : ''), 'email') !== false ||
+                strpos(strtolower(isset($data[1]) ? $data[1] : ''), 'mail') !== false
             )) {
                 teva_debug_log("Skipping header line: " . implode(';', $data));
                 continue;
@@ -1340,7 +1343,7 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
         
         $session_data = $this->validate_session_token($_COOKIE['survey_session']);
         
-        // Asegurar que siempre tenga la clave 'nombre'
+        // ✅ COMPATIBLE PHP 7.4: Usar isset en lugar de ??
         if ($session_data && !isset($session_data['nombre'])) {
             $session_data['nombre'] = '';
         }
@@ -1370,7 +1373,7 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
         
         $session_data = $this->validate_session_token($token);
         
-        // Asegurar que siempre tenga la clave 'nombre'
+        // ✅ COMPATIBLE PHP 7.4: Usar isset en lugar de ??
         if ($session_data && !isset($session_data['nombre'])) {
             $session_data['nombre'] = '';
         }
@@ -1403,7 +1406,8 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
             return array(
                 'survey_id' => $session->survey_id,
                 'email' => $session->email,
-                'nombre' => isset($data['nombre']) ? $data['nombre'] : '' // AGREGAR: Incluir nombre con validación
+                // ✅ COMPATIBLE PHP 7.4: Usar isset en lugar de ??
+                'nombre' => isset($data['nombre']) ? $data['nombre'] : ''
             );
         } catch (Exception $e) {
             return false;
