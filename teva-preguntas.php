@@ -1230,7 +1230,7 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
                             <?php elseif ($attempt_count == 2): ?>
                                 <p><em>¡Lo logró en el segundo intento! 👏</em></p>
                             <?php else: ?>
-                                <p><em>¡Persistencia recompensada<?php echo !empty($nombre) ? ', ' . esc_html($nombre) : ''; ?>! Lo lograste en el intento <?php echo $attempt_count; ?>! 🎯</em></p>
+                                <p><em>¡Persistencia recompensada<?php echo !empty($nombre) ? ', ' . esc_html($nombre) : ''; ?>! Lo logró en el intento <?php echo $attempt_count; ?>! 🎯</em></p>
                             <?php endif; ?>
                         <?php else: ?>
                             <h3>¡Inténtelo de nuevo<?php echo !empty($nombre) ? ', ' . esc_html($nombre) : ''; ?>! 🤔</h3>
