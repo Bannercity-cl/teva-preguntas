@@ -43,4 +43,8 @@ jobs:
           prerelease: false
           generate_release_notes: true
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Clean up
+        run: |
+          rm teva-preguntas.zip
+          echo "Release v${{ steps.get_version.outputs.version }} created successfully."
