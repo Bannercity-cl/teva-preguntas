@@ -1,3 +1,5 @@
+[![Create Release and ZIP](https://github.com/Bannercity-cl/teva-preguntas/actions/workflows/release.yml/badge.svg)](https://github.com/Bannercity-cl/teva-preguntas/actions/workflows/release.yml)
+
 # TEVA Preguntas - Sistema de Encuestas por Email
 
 Un plugin de WordPress para crear y gestionar encuestas interactivas enviadas por email con validación de participantes mediante CSV y formularios de registro integrados.
