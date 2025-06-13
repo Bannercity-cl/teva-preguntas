@@ -1025,7 +1025,7 @@ MEDICINA GENERAL;doctor3@consultorio.cl</pre>
                             <!-- ✅ MOSTRAR CORRECTAMENTE: próximo intento = attempts + 1 -->
                             <p><strong>💡 Intento número <?php echo $attempts + 1; ?></strong></p>
                             <?php if ($attempts == 1): ?>
-                                <p>Tu primera respuesta no fue correcta. ¡Inténtalo de nuevo!</p>
+                                <p>Su primera respuesta no fue correcta. ¡Inténtalo de nuevo!</p>
                             <?php elseif ($attempts >= 2): ?>
                                 <p>Ha intentado <?php echo $attempts; ?> veces. ¡Sigue intentando!</p>
                             <?php endif; ?>
